@@ -74,3 +74,24 @@
 - `npm install` avisa de que no ejecutó `node-gyp rebuild` para `better-sqlite3`. Se investigó antes de darlo por bueno: la v13 trae binarios N-API precompilados para todas las plataformas, así que no hace falta compilar (comprobado con una consulta en memoria). El aviso se explicará en el README.
 - La revisión (`/revisar`) encontró referencias a Node 20 en el plan y en `directrices-ia.md` que contradecían la decisión; se corrigieron.
 - Versiones mayores muy recientes (TypeScript 7, Vitest 5, better-sqlite3 13): todo funciona, pero hay que tenerlo en cuenta al consultar documentación.
+
+## 20/11/2026 — B2: configuración de entorno
+
+**Qué se pidió:** leer `PORT` y `DB_PATH` desde el entorno, con valores por defecto, en un único sitio validado.
+
+**Qué se hizo:**
+- `backend/src/config/env.ts` con `loadEnv(source)`, validado con Zod (`PORT` entero entre 1 y 65535, por defecto 3000; `DB_PATH` no vacío, por defecto `./data/saas-o-matic.db`).
+- `backend/.env.example` y `backend/tests/config/env.test.ts` (8 casos).
+- Dependencia `zod` (4.6.7), prevista en la spec.
+- Resultado: **44/44 tests en verde**; typecheck y build sin errores.
+
+**Decisiones de diseño:**
+- **`loadEnv` recibe el entorno como parámetro** en lugar de leer `process.env`. Así se testea sin mocks y queda un único punto de lectura en `server.ts` (B6).
+- **Un valor inválido hace fallar el arranque** con un mensaje que nombra la variable, en vez de usar el valor por defecto en silencio.
+- Cómo se carga el fichero `.env` se decide en B6, junto con el script `dev`.
+
+**Correcciones del desarrollador:** ninguna.
+
+**Problemas detectados (revisión con `/revisar`, aprobada):**
+- Un `PORT=` vacío en `.env` falla en vez de usar el valor por defecto. Se acepta como está.
+- `DB_PATH` relativo depende del directorio de trabajo. Se resolverá respecto a `backend/` en B3.
