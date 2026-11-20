@@ -1,7 +1,16 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderApp } from './testUtils';
+
+// Las páginas piden datos al montarse; aquí solo interesan el layout y las rutas.
+beforeEach(() => {
+  vi.stubGlobal('fetch', vi.fn(async () => new Response('[]', { status: 200 })));
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe('App: layout y rutas', () => {
   it('muestra la marca, el selector de divisa y el enlace de salto al contenido', () => {

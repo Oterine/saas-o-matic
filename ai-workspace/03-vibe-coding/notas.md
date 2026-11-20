@@ -428,3 +428,26 @@
   - corregido: `Layout.tsx` exportaba una constante que nadie usaba, contra el criterio de F3 de que los ficheros de componentes solo exporten componentes;
   - pendiente para F9 (anotado en el plan): mover el foco al contenido en cada cambio de ruta.
 - No hay navegador en la sesión de la IA, así que la comprobación visual en móvil y escritorio queda para el desarrollador.
+
+## 20/11/2026 — F5: dashboard y buscador
+
+**Qué se pidió:** la lista de clientes en tarjetas, con un buscador con debounce y los estados de carga, error y vacío.
+
+**Qué se hizo:**
+- `hooks/useAsync.ts`: carga genérica con `loading`/`success`/`error`, `retry`, cancelación, descarte de respuestas viejas y datos conservados durante la recarga. `useExchangeRates` se reescribió sobre él.
+- `hooks/useDebouncedValue.ts` y `config/search.ts` (300 ms).
+- `utils/display.ts` (país en español con `Intl.DisplayNames` y etiqueta del plan) y `utils/errors.ts` (mensaje para mostrar).
+- `features/customers/CustomerListPage.tsx` y `CustomerCard.tsx`, con estilos de cuadrícula responsive.
+- Resultado: **63/63 tests en verde**; build sin errores.
+
+**Decisiones de diseño:**
+- **Un único hook de carga para todas las vistas.** Elimina la lógica duplicada de `useExchangeRates`.
+- **Mientras se recarga, la lista anterior sigue visible** (`aria-busy`), para que no parpadee con cada búsqueda.
+- **Dos estados vacíos distintos:** sin clientes (con enlace para crear el primero) y sin coincidencias para la búsqueda.
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar el punto importante de la revisión.
+
+**Problemas detectados:**
+- **Un test hizo caer el proceso de Vitest por falta de memoria (código 134).** Pasaba a `useAsync` una función nueva en cada render, así que el efecto se volvía a ejecutar en bucle infinito. El hook cumplía lo que decía su comentario ("`load` debe ser estable"), pero una trampa tan fácil de pisar no puede depender de un comentario.
+- **Revisión (`/revisar`), importante, corregido:** la firma pasó a `useAsync(load, key)`. Solo se recarga al cambiar `key` o al reintentar, y `load` se lee de una ref, así que una función inline ya no provoca el bucle. Test nuevo con una función inline y varios renders: una sola carga. La página quedó más simple, sin `useCallback`.
+- Se acepta no guardar el texto buscado en la URL (la spec no lo pide).
