@@ -9,7 +9,7 @@ export function CustomerCard({ customer }: { customer: Customer }) {
       <h2 className="customer-card__name">
         <Link to={`/customers/${customer.id}`}>{customer.companyName}</Link>
       </h2>
-      <dl className="customer-card__data">
+      <dl className="data-list">
         <div>
           <dt>Identificador fiscal</dt>
           <dd>{customer.taxId}</dd>

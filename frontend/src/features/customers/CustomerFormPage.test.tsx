@@ -2,15 +2,17 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { listCountries } from '../../api/countries';
-import { createCustomer } from '../../api/customers';
+import { createCustomer, getCustomer } from '../../api/customers';
 import { ApiError } from '../../api/http';
 import type { Customer } from '../../api/types';
 import { renderApp } from '../../testUtils';
 
 vi.mock('../../api/countries', () => ({ listCountries: vi.fn() }));
-vi.mock('../../api/customers', () => ({ createCustomer: vi.fn(), listCustomers: vi.fn() }));
+vi.mock('../../api/customers', () => ({ createCustomer: vi.fn(), getCustomer: vi.fn(), listCustomers: vi.fn() }));
+vi.mock('../../api/simulations', () => ({ listSimulations: vi.fn(async () => []), createSimulation: vi.fn() }));
 const listCountriesMock = vi.mocked(listCountries);
 const createCustomerMock = vi.mocked(createCustomer);
+const getCustomerMock = vi.mocked(getCustomer);
 
 const countries = [
   { code: 'DE', taxRate: 0.19 },
@@ -61,6 +63,7 @@ describe('CustomerFormPage', () => {
   it('registra el cliente y navega a su detalle', async () => {
     const user = userEvent.setup();
     createCustomerMock.mockResolvedValue(created);
+    getCustomerMock.mockResolvedValue(created);
     await renderForm();
 
     await fillForm(user);
@@ -73,7 +76,8 @@ describe('CustomerFormPage', () => {
       country: 'ES',
       plan: 'business',
     });
-    expect(await screen.findByRole('heading', { level: 1, name: 'Detalle del cliente' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Acme S.L.' })).toBeInTheDocument();
+    expect(getCustomerMock).toHaveBeenCalledWith(42, expect.any(AbortSignal));
   });
 
   it('muestra los errores de validación junto a cada campo y lleva el foco al primero', async () => {

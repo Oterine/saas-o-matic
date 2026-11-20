@@ -483,3 +483,29 @@
   - el plan enlaza su ayuda y su error a la vez.
 
   Hay dos tests nuevos para estos casos.
+
+## 20/11/2026 — F7: detalle del cliente e historial
+
+**Qué se pidió:** tarjetas responsive con los datos del cliente y su historial de simulaciones en la divisa seleccionada.
+
+**Qué se hizo:**
+- `utils/format.ts`: fechas, números y porcentajes con `Intl`.
+- `features/customer-detail/CustomerDetailPage.tsx`: id comprobado antes de llamar a la API, cliente e historial pedidos en paralelo, 404, error con reintento y título de pestaña con el nombre del cliente.
+- `CustomerInfoCard.tsx` y `SimulationHistory.tsx`, con `formatCents` de la divisa global y la nota del tipo de cambio actual (A14).
+- `Card` admite `labelledBy` (regiones con nombre) y `.data-list` es ahora la clase común.
+- Resultado: **84/84 tests en verde**; build sin errores.
+
+**Decisiones de diseño:**
+- **Historial como lista de tarjetas (`<ol>`) en lugar de una tabla:** se lee mejor en móvil, que es la prioridad (móvil primero).
+- **Cambiar de divisa solo reformatea:** el historial no se vuelve a pedir (lo comprueba un test).
+- **Un error del historial se muestra dentro de su sección,** sin ocultar los datos del cliente.
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar la mejora de la revisión.
+
+**Problemas detectados:**
+- **Antes de probar, la IA vio al releer que tras un 404 el título de la pestaña quedaba mal:** el efecto del padre se ejecuta después del del hijo y lo sobrescribía. Ahora el título lo pone un solo componente en cada caso (con test).
+- **Los tests de región por nombre obligaron a dar nombre accesible a las secciones** con `aria-labelledby`, lo que además mejora la navegación con lector de pantalla.
+- **Ajustes en tests anteriores por el nuevo detalle:**
+  - `App.test` respondía `[]` para cualquier URL y ahora da 404 en el detalle;
+  - el test de alta de F6 ahora comprueba que se llega al detalle del cliente creado.
+- **Revisión (`/revisar`, aprobada), corregido:** la flecha de "← Volver a clientes" se leía en voz alta; ahora está oculta al lector de pantalla.

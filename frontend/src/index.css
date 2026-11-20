@@ -240,26 +240,83 @@ a.button {
   margin-bottom: var(--space-2);
 }
 
-.customer-card__data {
+/* Pares etiqueta-valor (tarjetas de cliente, detalle e historial). */
+.data-list {
   margin: 0;
   display: grid;
   gap: var(--space-1);
 }
 
-.customer-card__data div {
+.data-list div {
   display: flex;
   justify-content: space-between;
   gap: var(--space-2);
 }
 
-.customer-card__data dt {
+.data-list dt {
   color: var(--color-text-muted);
 }
 
-.customer-card__data dd {
+.data-list dd {
   margin: 0;
   text-align: right;
   overflow-wrap: anywhere;
+}
+
+.data-list__total {
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--color-border);
+  font-weight: 700;
+}
+
+.data-list__total dt {
+  color: var(--color-text);
+}
+
+/* Detalle del cliente: una columna en móvil, datos e historial lado a lado en escritorio. */
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+}
+
+.detail-layout {
+  display: grid;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.detail-card h2 {
+  font-size: 1.125rem;
+  margin-bottom: var(--space-3);
+}
+
+.history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.history-item {
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.history-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.history-item__date {
+  margin: 0 0 var(--space-2);
+  font-weight: 600;
+}
+
+@media (min-width: 64rem) {
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
 }
 
 /* Formularios */

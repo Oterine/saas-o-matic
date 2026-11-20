@@ -4,8 +4,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderApp } from './testUtils';
 
 // Las páginas piden datos al montarse; aquí solo interesan el layout y las rutas.
+// Listas vacías en general y 404 para el detalle de un cliente.
 beforeEach(() => {
-  vi.stubGlobal('fetch', vi.fn(async () => new Response('[]', { status: 200 })));
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string) =>
+      /\/api\/customers\/\d+$/.test(url)
+        ? new Response('{"error":{"code":"NOT_FOUND","message":"Cliente no encontrado"}}', { status: 404 })
+        : new Response('[]', { status: 200 }),
+    ),
+  );
 });
 
 afterEach(() => {
