@@ -3,6 +3,7 @@ import type { Db } from './db/connection.js';
 import { NotFoundError, toErrorResponse } from './http/errors.js';
 import { createCustomerRepository } from './repositories/customerRepository.js';
 import { createSimulationRepository } from './repositories/simulationRepository.js';
+import { registerCountryRoutes } from './routes/countries.js';
 import { registerCustomerRoutes } from './routes/customers.js';
 import { registerPricingRoutes } from './routes/pricing.js';
 import { registerSimulationRoutes } from './routes/simulations.js';
@@ -37,6 +38,7 @@ export function buildApp({ db, logger = false }: AppOptions): FastifyInstance {
   registerCustomerRoutes(app, { customers });
   registerSimulationRoutes(app, { simulationService });
   registerPricingRoutes(app);
+  registerCountryRoutes(app);
 
   return app;
 }

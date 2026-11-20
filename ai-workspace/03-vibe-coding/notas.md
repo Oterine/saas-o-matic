@@ -282,3 +282,20 @@
 **Problemas detectados:**
 - **El primer borrador del test de la tabla §3.1 calculaba el impuesto esperado con la misma fórmula que el código,** así que no habría detectado un error en ella. La IA lo vio antes de la revisión y puso los valores esperados escritos a mano.
 - **Revisión (`/revisar`, aprobada), corregido:** `country` repetido en la URL respondía "El país debe ser texto", un mensaje confuso (comprobado ejecutándolo). Ahora cualquier valor repetido o array responde "… debe ser un único valor", también en `search` y en los cuerpos JSON. Spec §6 actualizada.
+
+## 20/11/2026 — B10b: `GET /countries`
+
+**Qué se pidió:** exponer los países soportados para que el frontend no duplique la tabla de impuestos (decisión F6 del plan).
+
+**Qué se hizo:**
+- `routes/countries.ts`: `[{ code, taxRate }]` ordenado por código, leído de `config/taxRates.ts`. Registrado en `app.ts`.
+- `tests/routes/countries.test.ts`: la tabla exacta de la spec §3.2 y la coincidencia con la configuración.
+- Resultado: **194/194 tests en verde**; typecheck y build sin errores.
+
+**Decisiones de diseño:**
+- **La lista se calcula una vez al registrar la ruta,** porque la configuración no cambia mientras el servidor está en marcha.
+- **La respuesta solo trae el código ISO.** El nombre en español lo obtendrá el frontend con `Intl.DisplayNames('es', { type: 'region' })`, sin dependencias ni traducciones duplicadas. Queda como requisito para F6.
+
+**Correcciones del desarrollador:** ninguna.
+
+**Problemas detectados (revisión con `/revisar`, aprobada):** ninguno que requiera cambios.
