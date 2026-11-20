@@ -239,3 +239,26 @@
 - **Revisión (`/revisar`, aprobada), dos mejoras aplicadas:**
   - el servicio lanzaba `NotFoundError`, una clase de `http/`, así que la orquestación dependía de la capa HTTP. Ahora lanza `CustomerNotFoundError` propio, igual que el repositorio con `DuplicateTaxIdError`;
   - `customerId` aceptaba 0 y su máximo producía el mensaje "no puede superar 9.007.199.254.740.991". Ahora es un entero positivo con el mensaje "El cliente debe ser un identificador válido" (4 tests nuevos).
+
+## 20/11/2026 — B9: endpoints de lectura
+
+**Qué se pidió:** `GET /customers?search=`, `GET /customers/:id` y `GET /customers/:id/simulations` para el frontend.
+
+**Qué se hizo:**
+- `routes/schemas/params.ts`: `:id` como entero positivo escrito solo con dígitos.
+- `customerSearchQuerySchema`: `search` opcional, de hasta 200 caracteres y sin repetirse.
+- `routes/customers.ts`: listado/búsqueda y detalle. `routes/simulations.ts`: historial con el mismo presenter que el `POST`.
+- `simulationService.listForCustomer`, con `requireCustomer` compartido con `create`.
+- Spec §6: límite y unicidad de `search`.
+- Resultado: **167/167 tests en verde**; typecheck y build sin errores.
+
+**Decisiones de diseño:**
+- **El `:id` se valida con una expresión regular sobre el texto,** no con `Number()`, que aceptaría por error `1e3`, `1.5` o `-1`. También se rechazan los números que no caben en un entero seguro.
+- **El historial pasa por el servicio:** aplica la misma regla de 404 que la creación, en vez de devolver `[]` para un cliente que no existe.
+- **`search` de hasta 200 caracteres,** igual que el nombre de empresa: un texto más largo no puede coincidir con nada.
+
+**Correcciones del desarrollador:** ninguna.
+
+**Problemas detectados (revisión con `/revisar`, aprobada):**
+- La spec no recogía el límite ni la unicidad de `search`. Se documentaron.
+- "Buscar el cliente o 404" aparece en la ruta de detalle y en el servicio. Se acepta: son dos líneas que usan la misma clase de error.

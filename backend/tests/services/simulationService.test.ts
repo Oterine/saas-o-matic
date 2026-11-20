@@ -46,6 +46,16 @@ describe('simulationService.create', () => {
     expect(service.create({ customerId, ...usage })).toMatchObject({ baseCents: 14000, taxRatePercent, taxCents });
   });
 
+  it('listForCustomer devuelve el historial del cliente', () => {
+    const customerId = createCustomer('ES', 'B12345674');
+    const created = service.create({ customerId, ...usage });
+    expect(service.listForCustomer(customerId)).toEqual([created]);
+  });
+
+  it('listForCustomer lanza CustomerNotFoundError si el cliente no existe', () => {
+    expect(() => service.listForCustomer(999)).toThrow(CustomerNotFoundError);
+  });
+
   it('lanza CustomerNotFoundError si el cliente no existe y no guarda nada', () => {
     expect(() => service.create({ customerId: 999, ...usage })).toThrow(CustomerNotFoundError);
     const { count } = db.prepare('SELECT COUNT(*) AS count FROM simulations').get() as { count: number };

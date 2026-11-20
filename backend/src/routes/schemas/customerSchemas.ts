@@ -26,6 +26,14 @@ const newCustomerSchema = z.object(
   { error: 'El cuerpo de la petición debe ser un objeto JSON' },
 );
 
+/** `?search=` opcional. Más de 200 caracteres no puede coincidir con ningún nombre (spec §3.5). */
+export const customerSearchQuerySchema = z.object({
+  search: z
+    .string({ error: 'El texto de búsqueda debe aparecer una sola vez' })
+    .max(200, { error: 'El texto de búsqueda no puede superar los 200 caracteres' })
+    .optional(),
+});
+
 const taxIdInputSchema = z.object({ taxId: requiredText('El identificador fiscal'), country: supportedCountry });
 
 /** Valida el identificador con el algoritmo del país, si ambos campos son utilizables. */

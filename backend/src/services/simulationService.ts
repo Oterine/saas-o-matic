@@ -1,5 +1,6 @@
 import { getTaxRatePercent } from '../config/taxRates.js';
 import { calculateQuote } from '../domain/pricing.js';
+import type { Customer } from '../domain/customer.js';
 import type { Simulation } from '../domain/simulation.js';
 import type { CustomerRepository } from '../repositories/customerRepository.js';
 import type { SimulationRepository } from '../repositories/simulationRepository.js';
@@ -18,11 +19,16 @@ export interface SimulationServiceDeps {
 }
 
 export function createSimulationService({ customers, simulations }: SimulationServiceDeps) {
+  function requireCustomer(customerId: number): Customer {
+    const customer = customers.findById(customerId);
+    if (!customer) throw new CustomerNotFoundError(customerId);
+    return customer;
+  }
+
   return {
     /** Calcula el presupuesto con la tasa del país del cliente y lo guarda. Lanza CustomerNotFoundError si no existe. */
     create(request: SimulationRequest): Simulation {
-      const customer = customers.findById(request.customerId);
-      if (!customer) throw new CustomerNotFoundError(request.customerId);
+      const customer = requireCustomer(request.customerId);
 
       const taxRatePercent = getTaxRatePercent(customer.country);
       if (taxRatePercent === undefined) {
@@ -32,6 +38,12 @@ export function createSimulationService({ customers, simulations }: SimulationSe
 
       const quote = calculateQuote(request.activeUsers, taxRatePercent);
       return simulations.create({ ...request, ...quote, taxRatePercent });
+    },
+
+    /** Historial del cliente, de la más reciente a la más antigua. Lanza CustomerNotFoundError si no existe. */
+    listForCustomer(customerId: number): Simulation[] {
+      requireCustomer(customerId);
+      return simulations.listByCustomer(customerId);
     },
   };
 }
