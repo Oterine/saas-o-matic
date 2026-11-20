@@ -344,3 +344,31 @@
 **Problemas detectados:**
 - **Revisión (`/revisar`, aprobada), corregido:** el proxy apuntaba siempre a `localhost:3000`, así que cambiar `PORT` en el backend rompía el frontend sin un error claro. Ahora se lee `BACKEND_URL`, con `localhost:3000` por defecto (probado con el backend en el puerto 3100). Queda anotado para el README.
 - Pendiente para F4: quitar el comentario de `App.tsx` que cita la tarea del plan.
+
+## 20/11/2026 — F2: cliente de API tipado
+
+**Qué se pidió:** un único punto de acceso HTTP al backend, con errores tipados.
+
+**Qué se hizo:**
+- `src/api/http.ts`: `request<T>` y `ApiError { status, code, message, fields }`.
+- `src/api/types.ts`: contratos de la spec §6.
+- Una función por endpoint: `customers.ts`, `simulations.ts`, `pricing.ts` y `countries.ts` (adelantada desde F6 por ser trivial).
+- Tests: `http.test.ts` (9 casos) y `endpoints.test.ts` (URLs, métodos y cuerpos).
+- Resultado: **16/16 tests en verde**; build con typecheck sin errores.
+
+**Decisiones de diseño:**
+- **Todo fallo acaba en un `ApiError`:**
+  - un error con el formato de la API conserva `code`, `message` y `fields`;
+  - un error sin formato (502 del proxy) o un 200 que no es JSON → `UNEXPECTED_RESPONSE`;
+  - un fallo de red → `NETWORK_ERROR`, con un mensaje en español.
+- **Una cancelación no se convierte en error:** se propaga tal cual, para que los hooks con `AbortController` puedan descartar respuestas viejas sin mostrar nada.
+- **Sin validar las respuestas en tiempo de ejecución** (`as T`): se confía en nuestro backend, que está probado, y así no hace falta Zod en el frontend.
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar la mejora de la revisión.
+
+**Problemas detectados:**
+- **Antes de la revisión, la IA cubrió un caso que faltaba:** una respuesta 200 que no es JSON habría lanzado un `SyntaxError` crudo.
+- **Revisión (`/revisar`, aprobada):**
+  - se comprobó contra el backend compilado que el `+` con el que `URLSearchParams` codifica los espacios se lee como espacio (`search=acme+s.l` encuentra "Acme S.L.");
+  - corregido: la cancelación solo se reconocía como `AbortError`, y un `abort(motivo)` se habría mostrado como fallo de red. Ahora se comprueba también `signal.aborted` (test nuevo).
+- Se acepta que `types.ts` duplique los contratos del backend: compartir un paquete de tipos no compensa en un proyecto de este tamaño.
