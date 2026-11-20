@@ -164,3 +164,28 @@
 **Problemas detectados (revisión con `/revisar`, aprobada):**
 - Si el servicio no comprobara antes que el cliente existe, la FK haría que la API respondiera 500 en vez de 404. Queda como requisito para B8, con su test.
 - `mapSimulationRow` solo se prueba de forma indirecta, a través de `create`. Se acepta.
+
+## 20/11/2026 — B6: app Fastify, formato de errores y validación
+
+**Qué se pidió:** montar la app con un formato de error único (spec §6), un helper de validación con Zod y el arranque del servidor.
+
+**Qué se hizo:**
+- `src/http/errors.ts`: `HttpError`, `ValidationError` (422), `NotFoundError` (404) y `toErrorResponse`, que traduce además `DuplicateTaxIdError` (409), los 4xx de Fastify (422) y cualquier otro error (500 genérico).
+- `src/http/validate.ts`: `parseOrThrow`, que convierte los errores de Zod en `fields`, con Zod configurado en español.
+- `src/app.ts` (`buildApp` con los manejadores de error y de rutas inexistentes) y `src/server.ts` (`.env` opcional, entorno validado, BD, migraciones, `listen` y cierre ordenado).
+- Scripts `dev` (`tsx watch`) y `start`. Dependencias `fastify` y `tsx`.
+- Tests: `tests/http/errors.test.ts` y `validate.test.ts`.
+- Resultado: **100/100 tests en verde**; typecheck y build sin errores. Prueba manual con `npm run dev` y `npm start`: la BD se crea sola y las respuestas 404 y 422 reales tienen el formato correcto (comprobado con `curl`).
+
+**Decisiones de diseño:**
+- **Los errores del repositorio se traducen a HTTP en un único sitio** (`toErrorResponse`). Así las rutas no capturan errores.
+- **`.env` con `process.loadEnvFile`, nativo de Node,** en lugar de `dotenv` o flags de `tsx`. No añade dependencias y funciona igual con `dev` y con `start`.
+- **El 500 nunca devuelve el mensaje interno.** El detalle va al log de Fastify.
+
+**Correcciones del desarrollador:** ninguna. Aprobó corregir el punto importante de la revisión.
+
+**Problemas detectados:**
+- **La IA escribió primero un manejador de 404 enrevesado** (construía una respuesta 500 y la sobrescribía). Lo detectó al releer y lo simplificó antes de los tests.
+- **Un test falló por un motivo real:** la traducción al español de Zod no sirve para la interfaz ("se esperaba int, recibido número"). Decisión: los esquemas de B7 y B8 llevarán mensajes propios en español, y la traducción de Zod queda como respaldo.
+- **Revisión (`/revisar`), importante, corregido:** todo 4xx de Fastify decía "no es un JSON válido", también un cuerpo de más de 1 MB o una petición sin `content-type` (comprobado ejecutándolo). Ahora se mantiene el 422, con un mensaje según la causa: 413 → demasiado grande, 415 → falta JSON. Tres tests nuevos.
+- npm bloquea el `postinstall` de `esbuild` (lo usa `tsx`). Se comprobó que `tsx` funciona igualmente.
