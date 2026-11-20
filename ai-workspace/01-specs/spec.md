@@ -264,8 +264,9 @@ Diseño responsive (móvil primero), estados vacíos, mensajes de error de valid
 │   │   └── server.ts
 │   └── tests/
 ├── frontend/
-│   └── src/ (api/, components/, config/, features/, hooks/, utils/)
-├── package.json           arranque conjunto (concurrently)
+│   ├── src/ (api/, components/, config/, features/, hooks/, utils/)
+│   └── e2e/               prueba de punta a punta contra el backend real
+├── package.json           npm install / dev / test / build / test:e2e de los dos proyectos (concurrently)
 ├── CLAUDE.md
 └── README.md
 ```
@@ -303,7 +304,7 @@ El desglose en tareas, con criterios de aceptación y verificación, está en `p
 - Las simulaciones persisten y aparecen en el historial tras recargar.
 - Cambiar la divisa actualiza todos los importes sin recargar la página.
 - Si la API de divisas falla, la app sigue funcionando en EUR y muestra el aviso.
-- El proyecto arranca en local con pocos comandos (`npm install` y `npm run dev` en backend y frontend, o una sola vez desde la raíz), con migración automática de la base de datos.
+- El proyecto arranca en local con pocos comandos (`npm install` y `npm run dev` desde la raíz, o en cada carpeta), con migración automática de la base de datos y sin herramientas de compilación.
 
 ## 12. Decisiones cerradas (20/11/2026)
 

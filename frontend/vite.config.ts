@@ -24,6 +24,8 @@ export default defineConfig(({ mode }) => {
     server: { port: 5173, proxy: apiProxy },
     preview: { port: 4173, proxy: apiProxy },
     test: {
+      // Solo tests unitarios: los de punta a punta (e2e/) tienen su propia configuración.
+      include: ['src/**/*.test.{ts,tsx}'],
       environment: 'jsdom',
       setupFiles: ['./src/setupTests.ts'],
       css: false,

@@ -574,3 +574,35 @@
 
   Los dos se corrigieron antes del commit.
 - **Pendiente:** el desarrollador debe revisar visualmente la app en móvil y escritorio (la IA no tiene navegador).
+
+## 20/11/2026 — R1: arranque conjunto desde la raíz y prueba de punta a punta
+
+**Qué se pidió:** levantar backend y frontend con un solo comando y convertir la prueba de punta a punta de F9 en un comando permanente.
+
+**Qué se hizo:**
+- `package.json` en la raíz con `concurrently`:
+  - `npm install` (con un `postinstall` que hace `npm ci` en los dos proyectos);
+  - `npm run dev` (dos servidores con la salida etiquetada);
+  - `npm test`, `npm run build` y `npm run test:e2e`.
+- `frontend/e2e/fullFlow.e2e.test.tsx` con su `vitest.e2e.config.ts` y su `tsconfig.e2e.json`. Arranca el backend compilado con una BD temporal y recorre el flujo completo por HTTP.
+- `backend/.npmrc` y `frontend/.npmrc` con `ignore-scripts=true`.
+- CLAUDE.md y spec §8/§11 actualizados.
+- Resultado: **backend 194/194, frontend 104/104 y e2e 1/1 en verde**; builds sin errores.
+
+**Decisiones de diseño:**
+- **Prueba de punta a punta separada de `npm test`,** para que los tests unitarios sigan siendo rápidos y no dependan del backend compilado.
+- **tsconfig propio para `e2e/`,** que añade los tipos de Node sin mezclarlos con el código del navegador.
+- **`npm ci` en el `postinstall`:** instala exactamente lo bloqueado y no reescribe los lockfiles en la máquina de quien clona.
+
+**Correcciones del desarrollador:**
+- Pidió la prueba de punta a punta permanente (decidido en F9).
+- Aprobó usar `npm ci` tras la revisión.
+
+**Problemas detectados:**
+- **Fallo grave detectado al simular un clon limpio** (borrando todos los `node_modules`): el `npm install` desde la raíz fallaba. El `npm install` anidado del `postinstall` ejecutaba el `node-gyp rebuild` que npm deduce para `better-sqlite3`, y sin Build Tools fallaba.
+  - Hasta ahora no había aparecido porque el npm 11.20 del desarrollador bloquea esos scripts en una instalación directa, pero no en una anidada, y otras versiones de npm no los bloquean nunca.
+  - **Solución:** `.npmrc` con `ignore-scripts=true`, que fija el estado ya verificado en B1 (binarios precompilados) con cualquier versión de npm. Además es una mejora de seguridad: ninguna dependencia ejecuta código al instalarse.
+  - Tras el cambio, la instalación limpia completa tarda unos 20 s, sin avisos.
+- **Limpieza en Windows de la prueba de punta a punta:** ahora espera a que el proceso del backend termine antes de borrar la BD. No queda ningún fichero residual.
+- **El typecheck de `e2e/` no veía los tipos de `jest-dom`;** se añadió `src/setupTests.ts` al tsconfig de la prueba.
+- **Revisión (`/revisar`, aprobada):** `npm install` en el `postinstall` podía reescribir los lockfiles (se vio con un metadato en `backend/package-lock.json`); se cambió a `npm ci`.

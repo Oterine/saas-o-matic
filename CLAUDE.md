@@ -24,7 +24,9 @@ backend/src/
   app.ts         composición de la app
   server.ts      arranque (entorno, BD, migraciones, listen)
 backend/tests/
-frontend/src/    api/, components/, config/, features/, hooks/, utils/
+frontend/src/    api/, components/, config/, features/, hooks/, utils/ (tests junto a cada fichero)
+frontend/e2e/    prueba de punta a punta contra el backend real (npm run test:e2e)
+package.json     raíz: npm install / dev / test / build / test:e2e de los dos proyectos
 ai-workspace/    specs, arquitectura y registro del proceso con IA
 ```
 
@@ -52,7 +54,8 @@ ai-workspace/    specs, arquitectura y registro del proceso con IA
 - `pricing`: cubrir 0, 1, 10, 11, 15, 50, 51 y 100 usuarios (tabla de la spec, sección 3.1).
 - `taxId`: DNI, NIE y CIF válidos e inválidos, con minúsculas, espacios y guiones.
 - Endpoints: casos felices y de error (422, 404, 409).
-- Antes de dar una tarea por terminada: `npm test` y `npm run build` en verde.
+- Antes de dar una tarea por terminada: `npm test` y `npm run build` en verde (desde la raíz cubren los dos proyectos).
+- `.npmrc` con `ignore-scripts=true` en backend y frontend: ninguna dependencia necesita scripts de instalación (better-sqlite3 trae binarios precompilados). No lo quites sin comprobar una instalación limpia.
 
 ## Frontend
 
