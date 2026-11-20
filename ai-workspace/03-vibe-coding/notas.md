@@ -606,3 +606,30 @@
 - **Limpieza en Windows de la prueba de punta a punta:** ahora espera a que el proceso del backend termine antes de borrar la BD. No queda ningún fichero residual.
 - **El typecheck de `e2e/` no veía los tipos de `jest-dom`;** se añadió `src/setupTests.ts` al tsconfig de la prueba.
 - **Revisión (`/revisar`, aprobada):** `npm install` en el `postinstall` podía reescribir los lockfiles (se vio con un metadato en `backend/package-lock.json`); se cambió a `npm ci`.
+
+## 20/11/2026 — D1: README
+
+**Qué se pidió:** un README para levantar backend y frontend en local en pocos pasos y explicar las decisiones del proyecto.
+
+**Qué se hizo:**
+- `README.md` con estas secciones:
+  - requisitos y arranque rápido (`git clone` → `npm install` → `npm run dev`);
+  - cada proyecto por separado, scripts y configuración opcional;
+  - problemas frecuentes y uso;
+  - tabla de la API (con el aviso de tildes en PowerShell 5.1);
+  - decisiones de negocio y arquitectura;
+  - enlace a `ai-workspace/` y notas técnicas.
+- **Comprobación:** se clonó el repositorio de GitHub en una carpeta temporal y se siguió el README al pie de la letra:
+  - `npm install` tardó 9 s, sin avisos ni compilación;
+  - `npm test` (194 + 104), `npm run test:e2e` (1/1) y `npm run dev` funcionaron, y la BD se creó sola;
+  - los 12 enlaces del README apuntan a ficheros que existen.
+
+**Decisiones de diseño:**
+- **Orden pensado para quien llega por primera vez:** requisitos, cuatro comandos y la URL al principio; detalle, API y arquitectura después.
+- **Las decisiones de negocio en una tabla,** incluidas todas las que la spec pedía documentar (§3.3, §4.1, A14).
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar dos mejoras de la revisión.
+
+**Problemas detectados (revisión con `/revisar`, aprobada), dos mejoras aplicadas:**
+- qué pasa con una versión de Node anterior a la 26 (aviso `EBADENGINE` y `nvm use`);
+- un apartado de problemas frecuentes: puertos ocupados, backend sin conexión y API de divisas caída.
