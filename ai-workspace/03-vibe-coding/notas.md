@@ -451,3 +451,35 @@
 - **Un test hizo caer el proceso de Vitest por falta de memoria (código 134).** Pasaba a `useAsync` una función nueva en cada render, así que el efecto se volvía a ejecutar en bucle infinito. El hook cumplía lo que decía su comentario ("`load` debe ser estable"), pero una trampa tan fácil de pisar no puede depender de un comentario.
 - **Revisión (`/revisar`), importante, corregido:** la firma pasó a `useAsync(load, key)`. Solo se recarga al cambiar `key` o al reintentar, y `load` se lee de una ref, así que una función inline ya no provoca el bucle. Test nuevo con una función inline y varios renders: una sola carga. La página quedó más simple, sin `useCallback`.
 - Se acepta no guardar el texto buscado en la URL (la spec no lo pide).
+
+## 20/11/2026 — F6: alta de cliente
+
+**Qué se pidió:** el formulario de alta con los errores de validación del backend junto a cada campo, foco accesible y navegación al detalle tras crear el cliente.
+
+**Qué se hizo:**
+- `components/FormField.tsx`: etiqueta, ayuda y error, con `fieldA11y` para enlazar `aria-invalid` y `aria-describedby`.
+- `features/customers/useCustomerForm.ts`: estado y envío del formulario.
+- `features/customers/CustomerFormPage.tsx`: países desde `GET /countries` con su nombre en español y España por defecto; plan como grupo de opciones.
+- Estilos de formulario en `index.css`.
+- `CustomerFormPage.test.tsx` (10 casos).
+- Resultado: **73/73 tests en verde**; build sin errores.
+
+**Decisiones de diseño:**
+- **Una sola fuente de validación: el backend.** `noValidate` evita los mensajes nativos del navegador, con otro idioma y estilo. Los mensajes llegan en español desde B7 y no hay reglas duplicadas que puedan desincronizarse.
+- **Dónde va cada error:**
+  - `fields` → junto a cada campo;
+  - `fields._`, error de red u otro error → aviso general del formulario;
+  - el 409 → en el campo del identificador fiscal.
+- **El foco va al primer error solo tras un envío rechazado,** mediante un contador de envíos rechazados.
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar dos mejoras de la revisión.
+
+**Problemas detectados:**
+- **Antes de probar, la IA detectó al releer un fallo de usabilidad:** el efecto del foco dependía de `fieldErrors`, así que al corregir un campo el foco saltaba al siguiente con error mientras el usuario escribía. Se corrigió y hay un test que lo cubre. En la misma relectura se corrigieron una cadena `'hint'` pasada en lugar de la ayuda real, un `aria-invalid` sin sentido en la primera opción del plan y un `setField` inestable.
+- **Se quitó un comentario `eslint-disable`** que no hacía nada (el proyecto no usa ESLint).
+- **Dos tests fallaron por errores del propio test:** contaban también las opciones del selector de divisa de la cabecera, y comprobaban el país por defecto antes de que se aplicara.
+- **Revisión (`/revisar`, aprobada), dos mejoras aplicadas:**
+  - el campo País se pinta siempre, para que su error se vea aunque la lista de países no cargue;
+  - el plan enlaza su ayuda y su error a la vez.
+
+  Hay dos tests nuevos para estos casos.

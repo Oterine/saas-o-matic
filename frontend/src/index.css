@@ -262,6 +262,68 @@ a.button {
   overflow-wrap: anywhere;
 }
 
+/* Formularios */
+.form {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 36rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.form-field label,
+.form-field legend {
+  font-weight: 600;
+  padding: 0;
+}
+
+.form-field--invalid input,
+.form-field--invalid select,
+input[aria-invalid='true'],
+select[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.form-field__hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.form-field__error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.radio {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  font-weight: 400;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
 /* Estados de carga, error y vacío */
 .state {
   padding: var(--space-3);
