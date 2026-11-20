@@ -372,3 +372,33 @@
   - se comprobó contra el backend compilado que el `+` con el que `URLSearchParams` codifica los espacios se lee como espacio (`search=acme+s.l` encuentra "Acme S.L.");
   - corregido: la cancelación solo se reconocía como `AbortError`, y un `abort(motivo)` se habría mostrado como fallo de red. Ahora se comprueba también `signal.aborted` (test nuevo).
 - Se acepta que `types.ts` duplique los contratos del backend: compartir un paquete de tipos no compensa en un proyecto de este tamaño.
+
+## 20/11/2026 — F3: divisas (servicio, caché, contexto y selector)
+
+**Qué se pidió:** un selector global de divisa con la API pública de tipos de cambio, con los estados obligatorios de carga, error con reintento y *fallback* a EUR.
+
+**Qué se hizo:**
+- `config/currencies.ts`: divisas, URL, TTL de 1 hora y configuración regional.
+- `api/exchangeRates.ts`: llamada a la API externa con la respuesta validada y caché previa.
+- `utils/ratesCache.ts`: `localStorage` con caducidad y memoria como respaldo.
+- `utils/money.ts`: `formatMoney` con `Intl.NumberFormat`.
+- `hooks/useExchangeRates.ts`: carga → listo | error, con `retry`.
+- `features/currency/` (contexto y `CurrencyProvider`) y `hooks/useCurrency.ts`.
+- `components/CurrencySelector.tsx` y `ExchangeRateStatus.tsx`, integrados de forma provisional en la cabecera de `App`.
+- Resultado: **43/43 tests en verde**; build sin errores. Se comprobó el parser contra la API real.
+
+**Decisiones de diseño:**
+- **La divisa efectiva es la elegida solo si hay tipo de cambio para ella; si no, EUR.** El selector solo ofrece las divisas disponibles y está deshabilitado mientras carga o si hay error.
+- **`formatCents` en el contexto:** todas las vistas formatean igual y la conversión es solo de visualización (spec §7).
+- **El cargador de tipos se inyecta (`loadRates`):** los tests de integración funcionan sin red y sin mocks globales.
+- **Contexto, provider y hook en ficheros separados,** para que el refresco en caliente de React funcione bien.
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar dos mejoras de la revisión.
+
+**Problemas detectados:**
+- **Dos tests de integración fallaron por un error del propio test:** el importe de prueba se pintaba en un `<output>`, que tiene `role="status"` implícito y chocaba con el aviso de carga. Se cambió a `<span>`.
+- **Antes de la revisión, la IA reescribió `parseRatesResponse`** con un guard `isRecord` en vez de una conversión de tipo difícil de leer.
+- **Revisión (`/revisar`, aprobada), dos mejoras aplicadas:**
+  - las opciones muestran el nombre en español ("USD · dólar estadounidense") con `Intl.DisplayNames`, sin dependencias;
+  - el valor del `<select>` se busca en las divisas disponibles en vez de convertirlo a ciegas.
+- Se acepta no recordar la divisa elegida al recargar: la spec no lo pide.
