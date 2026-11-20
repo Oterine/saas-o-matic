@@ -299,3 +299,27 @@
 **Correcciones del desarrollador:** ninguna.
 
 **Problemas detectados (revisión con `/revisar`, aprobada):** ninguno que requiera cambios.
+
+## 20/11/2026 — B11: prueba de punta a punta del backend
+
+**Qué se pidió:** comprobar manualmente el backend completo sobre una BD limpia, reiniciar y verificar que los datos persisten (criterio de la spec §11).
+
+**Qué se hizo:**
+- `backend/requests.http`: peticiones de ejemplo de toda la API (REST Client), pensadas para lanzarse en orden sobre una BD vacía.
+- Prueba manual con `npm run dev`:
+  - la migración automática crea la BD;
+  - se recorrió toda la API: países, alta, 422 por DNI, 409, búsqueda, detalle, 404, vista previa, simulaciones e historial;
+  - tras reiniciar, el cliente y el historial seguían ahí;
+  - `schema_migrations` tenía una sola fila después de dos arranques.
+- Resultado: **194/194 tests en verde**; build sin errores. La BD de prueba se borró al terminar.
+
+**Decisiones de diseño:**
+- **La prueba arranca con `npm run dev`,** tal y como lo hará quien siga el README, en vez de usar `app.inject`.
+- **La vista previa y la simulación guardada se compararon con los mismos datos:** 14000 / 2940 / 16940 en ambas.
+
+**Correcciones del desarrollador:** ninguna.
+
+**Problemas detectados:**
+- **Falsa alarma investigada antes de tocar código:** la búsqueda "alvarez" devolvió `[]` y el nombre salía como `Ãlvarez`. La causa no estaba en el backend: el script de prueba se guardó en UTF-8 sin BOM y PowerShell 5.1 lo leyó como ANSI, así que corrompió la "Á" antes de enviarla. Las pistas fueron que los textos del servidor ("válidos") se veían bien y que las cabeceras del propio script estaban corrompidas. Al repetir la prueba con un escape JSON (`Á`), la búsqueda funcionó (comprobado comparando bytes UTF-8).
+- Este riesgo puede afectar a quien pruebe con `curl` desde PowerShell. Se añadió al plan del README (D1) recomendar `requests.http` o escapes JSON.
+- **Backend completo: B1–B11 cerradas.**

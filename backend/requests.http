@@ -1,0 +1,75 @@
+# Peticiones de ejemplo de la API de SaaS-O-Matic.
+# Se pueden lanzar desde VS Code con la extensión REST Client, o copiarlas a curl o Postman.
+# Requiere el backend arrancado: cd backend && npm run dev
+# Pensado para lanzarse en orden sobre una BD vacía (los ids /customers/1 y el 409 dependen de ello).
+# Para empezar de cero, para el servidor y borra backend/data/.
+
+@baseUrl = http://localhost:3000
+
+### Países soportados y su tasa de impuesto
+GET {{baseUrl}}/countries
+
+### Alta de cliente (ejemplo de la spec) → 201
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "companyName": "Acme S.L.",
+  "taxId": "B12345674",
+  "contactEmail": "ops@acme.es",
+  "country": "ES",
+  "plan": "business"
+}
+
+### Alta con DNI de letra incorrecta → 422 con fields.taxId
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "companyName": "Pepe Pérez",
+  "taxId": "12345678A",
+  "contactEmail": "pepe@example.es",
+  "country": "ES",
+  "plan": "starter"
+}
+
+### Alta con el mismo identificador escrito de otra forma → 409
+POST {{baseUrl}}/customers
+Content-Type: application/json
+
+{
+  "companyName": "Otra S.A.",
+  "taxId": "b-1234.5674",
+  "contactEmail": "info@otra.es",
+  "country": "ES",
+  "plan": "starter"
+}
+
+### Listado completo (orden alfabético)
+GET {{baseUrl}}/customers
+
+### Búsqueda por nombre o identificador fiscal (parcial, sin mayúsculas ni tildes)
+GET {{baseUrl}}/customers?search=acme
+
+### Detalle de cliente
+GET {{baseUrl}}/customers/1
+
+### Cliente inexistente → 404
+GET {{baseUrl}}/customers/999
+
+### Vista previa sin guardar (para el slider)
+GET {{baseUrl}}/pricing/preview?users=15&country=ES
+
+### Guardar una simulación → 201
+POST {{baseUrl}}/simulations
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "activeUsers": 15,
+  "storageGb": 100,
+  "apiCalls": 50000
+}
+
+### Historial de simulaciones del cliente (más reciente primero)
+GET {{baseUrl}}/customers/1/simulations
