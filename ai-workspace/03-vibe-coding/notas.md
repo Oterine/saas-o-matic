@@ -323,3 +323,24 @@
 - **Falsa alarma investigada antes de tocar código:** la búsqueda "alvarez" devolvió `[]` y el nombre salía como `Ãlvarez`. La causa no estaba en el backend: el script de prueba se guardó en UTF-8 sin BOM y PowerShell 5.1 lo leyó como ANSI, así que corrompió la "Á" antes de enviarla. Las pistas fueron que los textos del servidor ("válidos") se veían bien y que las cabeceras del propio script estaban corrompidas. Al repetir la prueba con un escape JSON (`Á`), la búsqueda funcionó (comprobado comparando bytes UTF-8).
 - Este riesgo puede afectar a quien pruebe con `curl` desde PowerShell. Se añadió al plan del README (D1) recomendar `requests.http` o escapes JSON.
 - **Backend completo: B1–B11 cerradas.**
+
+## 20/11/2026 — F1: proyecto frontend (Vite + React + TypeScript)
+
+**Qué se pidió:** preparar el proyecto frontend con tests y un proxy hacia el backend.
+
+**Qué se hizo:**
+- `frontend/package.json` (scripts `dev`, `build` con typecheck, `preview`, `typecheck` y `test`), `tsconfig.json` (app) y `tsconfig.node.json` (`vite.config.ts`), `vite.config.ts` (proxy `/api` y Vitest con jsdom), `index.html`, `src/main.tsx`, `src/App.tsx`, `src/index.css` (variables de diseño, móvil primero, foco visible, tema oscuro), `src/setupTests.ts`, un test de humo y `.env.example`.
+- Dependencias: React 19, Vite 8, Vitest 5, jsdom y Testing Library. Además, `@types/node` y `@testing-library/dom` (*peer* obligatoria), justificadas.
+- Resultado: test de humo y build en verde. Prueba manual: `localhost:5173/api/*` llega al backend, y `/` y `/customers/1` sirven la app.
+
+**Decisiones de diseño:**
+- **Proyecto montado a mano, sin `create-vite`:** no hay código de ejemplo que borrar.
+- **Proxy `/api` que quita el prefijo:** no hace falta CORS ni otra dependencia, y las rutas del SPA no chocan con las de la API.
+- **Tests junto a su fichero y configuración en `src/setupTests.ts`,** como es habitual en React, sin crear carpetas que CLAUDE.md no recoge.
+- **CSS plano con variables,** sin framework de estilos, para no añadir dependencias.
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar la mejora de la revisión.
+
+**Problemas detectados:**
+- **Revisión (`/revisar`, aprobada), corregido:** el proxy apuntaba siempre a `localhost:3000`, así que cambiar `PORT` en el backend rompía el frontend sin un error claro. Ahora se lee `BACKEND_URL`, con `localhost:3000` por defecto (probado con el backend en el puerto 3100). Queda anotado para el README.
+- Pendiente para F4: quitar el comentario de `App.tsx` que cita la tarea del plan.
