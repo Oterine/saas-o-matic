@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import { App } from './App';
 import { CurrencyProvider } from './features/currency/CurrencyProvider';
 import './index.css';
@@ -9,8 +10,10 @@ if (!container) throw new Error('No se encuentra el elemento #root en index.html
 
 createRoot(container).render(
   <StrictMode>
-    <CurrencyProvider>
-      <App />
-    </CurrencyProvider>
+    <BrowserRouter>
+      <CurrencyProvider>
+        <App />
+      </CurrencyProvider>
+    </BrowserRouter>
   </StrictMode>,
 );

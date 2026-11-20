@@ -402,3 +402,29 @@
   - las opciones muestran el nombre en español ("USD · dólar estadounidense") con `Intl.DisplayNames`, sin dependencias;
   - el valor del `<select>` se busca en las divisas disponibles en vez de convertirlo a ciegas.
 - Se acepta no recordar la divisa elegida al recargar: la spec no lo pide.
+
+## 20/11/2026 — F4: layout y enrutado
+
+**Qué se pidió:** una cabecera con el selector de divisa y la navegación entre las vistas.
+
+**Qué se hizo:**
+- `react-router-dom` 7, aprobada en el plan.
+- `components/Layout.tsx`: enlace de salto, cabecera con la marca y la divisa, aviso de tipos de cambio y `<main>` enfocable.
+- `App.tsx`: rutas `/`, `/customers/new`, `/customers/:id` y 404.
+- Páginas mínimas (encabezado y título de pestaña) para que las rellenen F5–F7, y `NotFoundPage` completa.
+- Componentes comunes `Card`, `Loading`, `ErrorMessage` y `EmptyState`; hook `useDocumentTitle`; `testUtils.tsx` con `renderApp(path)`.
+- Resultado: **51/51 tests en verde**; build sin errores.
+
+**Decisiones de diseño:**
+- **URLs reales con `BrowserRouter`:** el detalle de un cliente sobrevive a una recarga (criterio §11). Con el proxy `/api` de F1, las rutas no chocan con la API.
+- **Accesibilidad desde el layout:** enlace "Saltar al contenido", `<main>` enfocable, un `h1` por página y título de pestaña por página.
+- **Estados de carga, error y vacío como componentes comunes,** con sus roles ARIA, para que todas las vistas los muestren igual.
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar la mejora de la revisión.
+
+**Problemas detectados:**
+- **La IA creó una carpeta `src/test/` para el helper de tests,** contra la convención que ella misma fijó en F1. Lo vio enseguida y lo movió a `src/testUtils.tsx` antes de la revisión.
+- **Revisión (`/revisar`, aprobada):**
+  - corregido: `Layout.tsx` exportaba una constante que nadie usaba, contra el criterio de F3 de que los ficheros de componentes solo exporten componentes;
+  - pendiente para F9 (anotado en el plan): mover el foco al contenido en cada cambio de ruta.
+- No hay navegador en la sesión de la IA, así que la comprobación visual en móvil y escritorio queda para el desarrollador.

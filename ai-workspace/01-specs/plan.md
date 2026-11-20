@@ -243,6 +243,7 @@ Convención: `npm test` y `npm run build` en verde dentro de `frontend/`.
 ### F9. Pulido de accesibilidad y responsive
 - **Objetivo:** repasar los criterios de la spec §7 "Calidad de interfaz".
 - **Ficheros:** CSS y los componentes que lo necesiten.
+- **Pendiente detectado en F4:** mover el foco al contenido principal en cada cambio de ruta, para que el lector de pantalla anuncie la nueva página.
 - **Aceptación:** sin errores graves de Lighthouse en accesibilidad. Todo usable a 360 px. Foco visible. Contraste suficiente.
 - **Verificación:** Lighthouse manual y navegación solo con teclado.
 
