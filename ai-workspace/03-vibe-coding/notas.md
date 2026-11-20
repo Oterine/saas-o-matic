@@ -189,3 +189,28 @@
 - **Un test falló por un motivo real:** la traducción al español de Zod no sirve para la interfaz ("se esperaba int, recibido número"). Decisión: los esquemas de B7 y B8 llevarán mensajes propios en español, y la traducción de Zod queda como respaldo.
 - **Revisión (`/revisar`), importante, corregido:** todo 4xx de Fastify decía "no es un JSON válido", también un cuerpo de más de 1 MB o una petición sin `content-type` (comprobado ejecutándolo). Ahora se mantiene el 422, con un mensaje según la causa: 413 → demasiado grande, 415 → falta JSON. Tres tests nuevos.
 - npm bloquea el `postinstall` de `esbuild` (lo usa `tsx`). Se comprobó que `tsx` funciona igualmente.
+
+## 20/11/2026 — B7: `POST /customers`
+
+**Qué se pidió:** dar de alta clientes con validación estricta: email, país, plan e identificador fiscal con el algoritmo oficial si el país es España.
+
+**Qué se hizo:**
+- `routes/schemas/customerSchemas.ts`: esquema Zod con mensajes propios en español y `parseNewCustomer`, que valida aparte el identificador fiscal con `validateTaxId` del dominio y lo devuelve normalizado.
+- `routes/customers.ts`: `POST /customers` (valida, guarda y responde 201). `app.ts` crea el repositorio y registra la ruta.
+- `tests/helpers/testApp.ts` (app sobre una BD en memoria migrada) y `tests/routes/customers.post.test.ts` (25 casos).
+- Spec §6: documentada la clave `_` de `fields` para los errores generales de la petición.
+- Resultado: **120/120 tests en verde**; typecheck y build sin errores. Prueba manual con el servidor real: 201 (ejemplo de la spec), 422 ("La letra de control del DNI no es correcta") y 409 (duplicado escrito como `b-12345674`).
+
+**Decisiones de diseño:**
+- **El identificador fiscal se valida fuera del esquema principal.** Depende del país, y una validación de Zod sobre el objeto entero solo se ejecuta si el resto de campos es válido. Así el usuario recibe a la vez el error del email y el del CIF, en vez de descubrirlos de uno en uno.
+- **El 409 no necesita código en la ruta:** el repositorio lanza `DuplicateTaxIdError` y `toErrorResponse` lo traduce.
+- **Mensajes escritos a mano,** que distinguen entre "es obligatorio" y "no es válido" (lo aprendido en B6).
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar las tres mejoras menores de la revisión.
+
+**Problemas detectados:**
+- Al conectar el repositorio en `buildApp`, fallaron los 9 tests de `errors.test.ts` (B6): creaban la app sobre una BD sin migrar. Se pasaron al helper común `createTestApp`.
+- Revisión (`/revisar`, aprobada), tres mejoras menores aplicadas:
+  - documentar la clave `fields._` en la spec;
+  - mensaje "El plan es obligatorio" cuando falta el plan, coherente con el resto de campos;
+  - tests de los límites exactos (nombre de 200 aceptado, email de más de 254 rechazado).

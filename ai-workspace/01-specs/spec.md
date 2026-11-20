@@ -176,7 +176,7 @@ Base: `http://localhost:3000`. Todo en JSON. Importes en **céntimos de EUR**.
 | 422 | `VALIDATION_ERROR` | Datos inválidos, JSON mal formado, parámetros de URL o query inválidos (por ejemplo, `:id` no numérico) |
 | 500 | `INTERNAL_ERROR` | Error inesperado; nunca expone detalles internos |
 
-`fields` solo aparece en `VALIDATION_ERROR` cuando el error se puede asociar a un campo.
+`fields` solo aparece en `VALIDATION_ERROR` y tiene un mensaje por campo. Los campos anidados usan la ruta con puntos (`address.country`). Un error que afecta a toda la petición, y no a un campo concreto (por ejemplo, un cuerpo que no es un objeto JSON), va en la clave especial `_`.
 
 ### POST /customers
 

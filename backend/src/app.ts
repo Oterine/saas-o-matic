@@ -1,6 +1,8 @@
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from 'fastify';
 import type { Db } from './db/connection.js';
 import { NotFoundError, toErrorResponse } from './http/errors.js';
+import { createCustomerRepository } from './repositories/customerRepository.js';
+import { registerCustomerRoutes } from './routes/customers.js';
 
 export interface AppOptions {
   db: Db;
@@ -8,7 +10,7 @@ export interface AppOptions {
 }
 
 /** Compone la aplicación. La BD se inyecta para poder usar una en memoria en los tests. */
-export function buildApp({ logger = false }: AppOptions): FastifyInstance {
+export function buildApp({ db, logger = false }: AppOptions): FastifyInstance {
   const app = Fastify({ logger });
 
   app.setErrorHandler((error, request, reply) => {
@@ -23,6 +25,8 @@ export function buildApp({ logger = false }: AppOptions): FastifyInstance {
     );
     return reply.status(statusCode).send(body);
   });
+
+  registerCustomerRoutes(app, { customers: createCustomerRepository(db) });
 
   return app;
 }

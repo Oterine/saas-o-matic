@@ -1,11 +1,10 @@
 import type { FastifyInstance } from 'fastify';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { buildApp } from '../../src/app.js';
-import { openDatabase, type Db } from '../../src/db/connection.js';
 import { NotFoundError, ValidationError } from '../../src/http/errors.js';
 import { DuplicateTaxIdError } from '../../src/repositories/errors.js';
+import { createTestApp, type TestApp } from '../helpers/testApp.js';
 
-let db: Db;
+let t: TestApp;
 let app: FastifyInstance;
 
 /** Registra una ruta de prueba que lanza el error indicado. */
@@ -16,8 +15,8 @@ function throwing(path: string, error: unknown): void {
 }
 
 beforeEach(() => {
-  db = openDatabase(':memory:');
-  app = buildApp({ db });
+  t = createTestApp();
+  app = t.app;
   throwing('/validation', new ValidationError('Los datos enviados no son válidos', { taxId: 'Letra incorrecta' }));
   throwing('/not-found', new NotFoundError('Cliente no encontrado'));
   throwing('/duplicate', new DuplicateTaxIdError('B12345674'));
@@ -26,8 +25,7 @@ beforeEach(() => {
 });
 
 afterEach(async () => {
-  await app.close();
-  db.close();
+  await t.close();
 });
 
 describe('formato de errores común', () => {
