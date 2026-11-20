@@ -95,3 +95,27 @@
 **Problemas detectados (revisión con `/revisar`, aprobada):**
 - Un `PORT=` vacío en `.env` falla en vez de usar el valor por defecto. Se acepta como está.
 - `DB_PATH` relativo depende del directorio de trabajo. Se resolverá respecto a `backend/` en B3.
+
+## 20/11/2026 — B3: conexión SQLite y migraciones
+
+**Qué se pidió:** abrir la base de datos con claves foráneas activas y aplicar las migraciones de forma automática e idempotente.
+
+**Qué se hizo:**
+- `src/db/connection.ts`: `resolveDbPath` (rutas relativas respecto a `backend/`, no al directorio de trabajo) y `openDatabase` (crea la carpeta y activa `foreign_keys=ON` y `journal_mode=WAL`).
+- `src/db/migrate.ts`: `runMigrations` con la tabla `schema_migrations`; cada migración se aplica en su propia transacción.
+- `src/db/migrations/001_initial.ts` (esquema de la spec v2, con `tax_rate_percent INTEGER`) e `index.ts`.
+- `.gitignore`: `backend/data/` (cubre también los ficheros `-wal` y `-shm` de SQLite).
+- Tests: `tests/db/migrate.test.ts` y `tests/db/connection.test.ts` (14 casos).
+- Resultado: **58/58 tests en verde**; typecheck y build sin errores.
+
+**Decisiones de diseño:**
+- **Migraciones como módulos TS que exportan el SQL,** no como ficheros `.sql`. Así `tsc` las copia a `dist/` sin un paso extra de build.
+- **Runner propio en lugar de una librería de migraciones:** son unas 40 líneas y no añaden dependencias.
+- **La ruta de la BD se resuelve con `import.meta.url`.** Funciona igual desde `src/` y desde `dist/`, se lance desde donde se lance (comprobado desde `%TEMP%`). Resuelve el punto pendiente de B2.
+
+**Correcciones del desarrollador:** ninguna. Aprobó corregir dos puntos menores que señaló la revisión.
+
+**Problemas detectados (revisión con `/revisar`, aprobada):**
+- CLAUDE.md decía que `repositories/` era el "único sitio con SQL", lo que contradice tener el esquema en `db/migrations/`. Se precisó como "SQL de datos" en CLAUDE.md, en `directrices-ia.md` y en la skill `revisar`, que además nombraba `domain/` como sitio permitido para el SQL.
+- Se borraron los `.gitkeep` de las carpetas que ya tienen contenido.
+- Pendiente sin urgencia: el runner no avisa de forma específica si dos migraciones tienen la misma versión (falla igualmente y revierte).

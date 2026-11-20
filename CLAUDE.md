@@ -17,7 +17,7 @@ backend/src/
   config/        tasas de impuestos, variables de entorno
   domain/        lógica de negocio PURA: pricing.ts, taxId.ts (sin I/O)
   db/            conexión y migraciones
-  repositories/  acceso a datos (único sitio con SQL)
+  repositories/  acceso a datos (único sitio con SQL de datos; el esquema vive en db/migrations/)
   services/      orquestación de casos de uso (repositorios + dominio)
   http/          formato de errores y helper de validación Zod
   routes/        customers.ts, simulations.ts, pricing.ts, countries.ts (solo HTTP)

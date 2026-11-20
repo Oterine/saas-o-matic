@@ -10,7 +10,7 @@ Revisa los cambios sin commitear (o el último commit si no hay cambios pendient
 ## Qué comprobar
 
 1. **Contra `CLAUDE.md`**
-   - Capas respetadas: las rutas solo validan y responden; no hay lógica de negocio ni SQL fuera de `domain/` y `repositories/`.
+   - Capas respetadas: las rutas solo validan y responden; no hay lógica de negocio fuera de `domain/` ni SQL de datos fuera de `repositories/` (el esquema vive en `db/migrations/`).
    - `domain/` sigue siendo puro (sin acceso a BD, red ni reloj).
    - Dinero en céntimos enteros, sin `float` en cálculos.
    - SQL parametrizado.
