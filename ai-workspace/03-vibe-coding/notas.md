@@ -683,3 +683,22 @@
 - Revisar la app en un navegador real, en móvil y escritorio: la IA no tuvo navegador en ninguna sesión, así que el aspecto visual no lo ha visto nadie.
 - Adaptar a PowerShell las reglas de `.claude/settings.json`, escritas para Bash.
 - Opcional: añadir a esta carpeta capturas de prompts o de la conversación.
+
+## 20/11/2026 — Permisos del asistente para PowerShell
+
+**Qué se pidió:** adaptar a PowerShell, la herramienta de terminal de este entorno Windows, las reglas de `.claude/settings.json`, que estaban escritas para Bash (pendiente desde B1).
+
+**Qué se hizo:**
+- `.claude/settings.json`: una regla `PowerShell(...)` por cada regla `Bash(...)` (test, build, `npm install` y `git status`/`diff`/`log`). Se añadió la denegación `Read(**/.env)`.
+- `02-arquitectura/directrices-ia.md`: se quitó la "limitación conocida" y se añadió el cambio a la tabla de evolución de las reglas.
+- Se validó que el JSON es correcto. Sin cambios de código.
+
+**Decisiones de diseño:**
+- **La sintaxis se tomó de la referencia de configuración de Claude Code** (skill `update-config`): `Herramienta(patrón)`, con `*` como comodín de prefijo. No se inventó.
+- **Se mantienen las reglas de Bash:** cada regla solo se aplica a su herramienta, y quien clone el repositorio en macOS o Linux usa Bash.
+
+**Correcciones del desarrollador:** ninguna.
+
+**Problemas detectados:**
+- **Fallo encontrado al leer el fichero antes de editarlo:** `Read(./.env)` solo protegía un `.env` en la raíz, pero los del proyecto están en `backend/.env` y `frontend/.env`, así que la denegación no protegía ninguno. Se corrigió con `Read(**/.env)`.
+- **No se pudo verificar en la sesión** que Claude Code aplique las reglas nuevas: los permisos se resuelven en la interfaz del desarrollador. Para comprobarlo hay que abrir `/permissions` (o reiniciar la sesión si no aparecen).

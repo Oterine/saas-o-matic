@@ -13,7 +13,7 @@ Cómo se configuró el asistente (Claude Code) para que el código siguiera patr
 | [plan.md](../01-specs/plan.md) | Tareas con objetivo, ficheros, criterio de aceptación y verificación, más la definición de terminado común. |
 | [/revisar](../../.claude/skills/revisar/SKILL.md) | Skill que audita los cambios contra CLAUDE.md y la spec, ejecuta tests y build, y devuelve problemas por gravedad **sin modificar nada**. |
 | [/registrar-sesion](../../.claude/skills/registrar-sesion/SKILL.md) | Skill que añade la nota de cada tarea a `03-vibe-coding/notas.md`. Prohíbe inventar correcciones: si no las conoce, pregunta. |
-| [.claude/settings.json](../../.claude/settings.json) | Permisos del asistente: reglas para permitir test, build y git y para denegar la lectura de `.env`. **Limitación conocida:** las reglas están escritas para Bash (`Bash(npm test:*)`…), pero en este entorno Windows los comandos se ejecutaron con PowerShell, y no se ha verificado que se apliquen. Además, `Bash(npm install)` es anterior al `npm ci` que usa ahora la raíz. Pendiente de revisar. |
+| [.claude/settings.json](../../.claude/settings.json) | Permisos del asistente: permite test, build y git (`npm install` incluido) y deniega la lectura de cualquier `.env`. Las reglas están duplicadas para las dos herramientas de terminal, `Bash(...)` (macOS y Linux) y `PowerShell(...)` (Windows), porque una regla solo se aplica a su herramienta. |
 
 ## Ciclo de cada tarea
 
@@ -38,6 +38,7 @@ Las reglas no se escribieron una sola vez: se ajustaron cuando la práctica most
 | Códigos HTTP **200 y 500** añadidos a 201/404/409/422; **JSON mal formado → 422** | La lista original no cubría las lecturas ni los errores inesperados. | Plan, B6 |
 | Estructura con **`frontend/e2e/`** y `package.json` en la raíz | La prueba de punta a punta pasó a ser permanente. | R1 |
 | **`.npmrc` con `ignore-scripts=true`** y la advertencia de no quitarlo sin una instalación limpia | Una instalación limpia intentaba compilar `better-sqlite3`. | R1 |
+| `settings.json`: reglas **`PowerShell(...)`** además de `Bash(...)`, y denegación **`Read(**/.env)`** | Las reglas de Bash no se aplicaban en Windows. `Read(./.env)` solo protegía la raíz, y los `.env` del proyecto están en `backend/` y `frontend/`. | Cierre |
 
 ## Qué funcionó para evitar código desorganizado
 
