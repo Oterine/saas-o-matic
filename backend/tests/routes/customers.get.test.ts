@@ -72,7 +72,7 @@ describe('GET /customers', () => {
   it('422 si search aparece repetido', async () => {
     const res = await get('/customers?search=a&search=b');
     expect(res.statusCode).toBe(422);
-    expect(res.json().error.fields).toHaveProperty('search');
+    expect(res.json().error.fields).toEqual({ search: 'El texto de búsqueda debe ser un único valor' });
   });
 });
 

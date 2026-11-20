@@ -126,6 +126,10 @@ describe('POST /customers: 422', () => {
     expect(Object.keys(fields).sort()).toEqual(['contactEmail', 'taxId']);
   });
 
+  it('campo de texto enviado como array', async () => {
+    expect(await expect422({ ...valid, country: ['ES', 'PT'] })).toEqual({ country: 'El país debe ser un único valor' });
+  });
+
   it('cuerpo que no es un objeto', async () => {
     expect(await expect422([1, 2, 3])).toHaveProperty('_');
   });

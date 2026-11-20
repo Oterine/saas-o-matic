@@ -262,3 +262,23 @@
 **Problemas detectados (revisión con `/revisar`, aprobada):**
 - La spec no recogía el límite ni la unicidad de `search`. Se documentaron.
 - "Buscar el cliente o 404" aparece en la ruta de detalle y en el servicio. Se acepta: son dos líneas que usan la misma clase de error.
+
+## 20/11/2026 — B10: `GET /pricing/preview`
+
+**Qué se pidió:** calcular sin guardar, para el slider del frontend, de modo que la lógica de tramos viva solo en el backend.
+
+**Qué se hizo:**
+- `services/pricingService.ts`: `quoteFor(activeUsers, country)`. `simulationService` también lo usa.
+- `routes/schemas/pricingSchemas.ts` (`users` solo con dígitos y después las reglas de `activeUsers`; `country` soportado), `toQuoteResponse` en `presenters.ts` y `routes/pricing.ts`.
+- `fields.ts`: mensaje "… debe ser un único valor" para un parámetro repetido o un array.
+- Resultado: **192/192 tests en verde**; typecheck y build sin errores.
+
+**Decisiones de diseño:**
+- **Una sola función de cálculo para la vista previa y la simulación guardada.** Así el número que ve el comercial en el slider es exactamente el que se guarda. La regla "país sin tasa → 500" queda en un único sitio.
+- **`users` se valida primero como texto de dígitos** (en la query todo llega como texto) y después con las mismas reglas que `activeUsers`, reutilizando el mismo campo.
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar la mejora de la revisión.
+
+**Problemas detectados:**
+- **El primer borrador del test de la tabla §3.1 calculaba el impuesto esperado con la misma fórmula que el código,** así que no habría detectado un error en ella. La IA lo vio antes de la revisión y puso los valores esperados escritos a mano.
+- **Revisión (`/revisar`, aprobada), corregido:** `country` repetido en la URL respondía "El país debe ser texto", un mensaje confuso (comprobado ejecutándolo). Ahora cualquier valor repetido o array responde "… debe ser un único valor", también en `search` y en los cuerpos JSON. Spec §6 actualizada.

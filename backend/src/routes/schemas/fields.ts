@@ -4,11 +4,17 @@ import { getTaxRatePercent } from '../../config/taxRates.js';
 
 const formatNumber = (value: number) => value.toLocaleString('es-ES');
 
+/** Mensaje de tipo incorrecto. Un array aparece al repetir un parámetro de query (`?country=ES&country=PT`). */
+function typeMessage(label: string, input: unknown, expected: string): string {
+  if (input === undefined) return `${label} es obligatorio`;
+  return Array.isArray(input) ? `${label} debe ser un único valor` : `${label} debe ser ${expected}`;
+}
+
 /** Texto obligatorio, sin espacios a los lados, con mensajes en español. */
 export function requiredText(label: string) {
   const required = `${label} es obligatorio`;
   return z
-    .string({ error: (issue) => (issue.input === undefined ? required : `${label} debe ser texto`) })
+    .string({ error: (issue) => typeMessage(label, issue.input, 'texto') })
     .trim()
     .min(1, { error: required });
 }
@@ -16,7 +22,7 @@ export function requiredText(label: string) {
 /** Número obligatorio entre 0 y `max`, con mensajes en español. */
 export function requiredNumber(label: string, max: number) {
   return z
-    .number({ error: (issue) => (issue.input === undefined ? `${label} es obligatorio` : `${label} debe ser un número`) })
+    .number({ error: (issue) => typeMessage(label, issue.input, 'un número') })
     .min(0, { error: `${label} no puede ser negativo` })
     .max(max, { error: `${label} no puede superar ${formatNumber(max)}` });
 }

@@ -29,7 +29,7 @@ const newCustomerSchema = z.object(
 /** `?search=` opcional. Más de 200 caracteres no puede coincidir con ningún nombre (spec §3.5). */
 export const customerSearchQuerySchema = z.object({
   search: z
-    .string({ error: 'El texto de búsqueda debe aparecer una sola vez' })
+    .string({ error: 'El texto de búsqueda debe ser un único valor' })
     .max(200, { error: 'El texto de búsqueda no puede superar los 200 caracteres' })
     .optional(),
 });
