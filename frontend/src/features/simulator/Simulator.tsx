@@ -57,7 +57,8 @@ export function Simulator({ customer, onSaved }: SimulatorProps) {
               type="number"
               inputMode="decimal"
               min={0}
-              step={0.01}
+              // "any": las flechas suben de 1 en 1 y se pueden escribir decimales (el máximo de 2 lo valida el backend).
+              step="any"
               value={draft.storageGb}
               onChange={(event) => update('storageGb', event.target.value)}
             />

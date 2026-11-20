@@ -122,6 +122,15 @@ describe('Simulator', () => {
     expect(onSaved).not.toHaveBeenCalled();
   });
 
+  it('el almacenamiento acepta decimales sin obligar a avanzar de 0,01 en 0,01', () => {
+    renderSimulator();
+    const storage = screen.getByLabelText('Almacenamiento (GB)');
+
+    expect(storage).toHaveAttribute('step', 'any');
+    fireEvent.change(storage, { target: { value: '0.29' } });
+    expect(storage).toBeValid();
+  });
+
   it('un campo vacío se envía ausente para que el backend responda "es obligatorio"', async () => {
     const user = userEvent.setup();
     createSimulationMock.mockResolvedValue({ id: 9 } as Simulation);

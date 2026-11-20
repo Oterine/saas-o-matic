@@ -702,3 +702,22 @@
 **Problemas detectados:**
 - **Fallo encontrado al leer el fichero antes de editarlo:** `Read(./.env)` solo protegía un `.env` en la raíz, pero los del proyecto están en `backend/.env` y `frontend/.env`, así que la denegación no protegía ninguno. Se corrigió con `Read(**/.env)`.
 - **No se pudo verificar en la sesión** que Claude Code aplique las reglas nuevas: los permisos se resuelven en la interfaz del desarrollador. Para comprobarlo hay que abrir `/permissions` (o reiniciar la sesión si no aparecen).
+
+## 20/11/2026 — Revisión en el navegador: paso del almacenamiento
+
+**Qué se pidió:** el desarrollador, al revisar la app en el navegador, señaló que en el campo de almacenamiento sería mejor subir de 1 en 1 y no de 0,01 en 0,01.
+
+**Qué se hizo:**
+- `Simulator.tsx`: el campo «Almacenamiento (GB)» pasa de `step={0.01}` a `step="any"`.
+- Test nuevo en `Simulator.test.tsx`: comprueba el paso y que `0.29` sigue siendo un valor válido para el navegador.
+- Resultado: **frontend 105/105 tests en verde**; build sin errores.
+
+**Decisiones de diseño:**
+- **`step="any"` en lugar de `step={1}`:** con paso 1, el navegador marcaría como inválido un valor como `0.29`, que la spec admite (hasta 2 decimales). Con `"any"`, las flechas avanzan de 1 en 1 y se pueden escribir decimales; el límite de 2 decimales lo sigue validando el backend.
+- **«Llamadas a la API» se queda de 1 en 1.** La IA planteó subir de 1000 en 1000, pero ese paso haría que el navegador marcase como inválidas cifras como 50.250.
+
+**Correcciones del desarrollador:**
+- Detectó el problema en la revisión visual: el paso de 0,01 obligaba a miles de pulsaciones para llegar a cifras normales. Los tests no lo detectaban.
+- Decidió dejar «Llamadas a la API» de 1 en 1, porque lo habitual es escribir la cifra.
+
+**Problemas detectados:** ninguno nuevo. La revisión visual sigue en curso.
