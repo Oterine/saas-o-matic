@@ -633,3 +633,33 @@
 **Problemas detectados (revisión con `/revisar`, aprobada), dos mejoras aplicadas:**
 - qué pasa con una versión de Node anterior a la 26 (aviso `EBADENGINE` y `nvm use`);
 - un apartado de problemas frecuentes: puertos ocupados, backend sin conexión y API de divisas caída.
+
+## 20/11/2026 — D2: documentación de arquitectura y cierre del registro
+
+**Qué se pidió:** documentar la arquitectura final y cerrar el registro del proceso.
+
+**Qué se hizo:**
+- `02-arquitectura/arquitectura.md`: vista general, capas del backend y traducción de errores, flujo de una simulación (diagramas Mermaid), frontend y niveles de prueba.
+- `02-arquitectura/modelo-datos.md`: diagrama entidad-relación, esquema y el porqué de cada decisión de datos, con una limitación conocida.
+- `02-arquitectura/decisiones.md`: 18 decisiones con sus alternativas descartadas, el motivo y la tarea.
+- `02-arquitectura/directrices-ia.md`: reescrito. Explica cómo se configuró el asistente y cómo evolucionaron sus reglas, y remite a CLAUDE.md como versión viva.
+- `03-vibe-coding/README.md`: resumen del proceso, con cifras, problemas detectados y decisiones del desarrollador.
+- `01-specs/plan.md`: estado final con el commit de cada tarea y los cambios respecto a lo planificado.
+- Comprobado: los 17 enlaces relativos apuntan a ficheros que existen.
+
+**Decisiones de diseño:**
+- **No duplicar las reglas:** `directrices-ia.md` era una copia de CLAUDE.md y se había desfasado (le faltaban `services/`, `http/`, los códigos 200 y 500, `e2e/` y `.npmrc`). Ahora cuenta la evolución de las reglas y remite a CLAUDE.md.
+- **Todo lo que dice el resumen sale de `notas.md`;** no añade nada que no esté registrado allí.
+
+**Correcciones del desarrollador:**
+- Eligió **documentar** el índice que no se usa, en lugar de quitarlo con una migración.
+- Pidió reformular en el resumen la mención a la corrección de la sección inicial del plan. La nota original de la primera sesión se mantiene tal cual, como registro de lo que pasó.
+
+**Problemas detectados (revisión con `/revisar`):**
+- **Importante, corregido:** `directrices-ia.md` decía que `.claude/settings.json` permitía comandos de test, build y git. Sus reglas son `Bash(...)` y aquí se usa PowerShell, algo que se avisó en B1 y **no se volvió a revisar en ninguna tarea**: el pendiente se perdió. Ahora el documento lo describe con exactitud como limitación conocida, sin inventar una sintaxis de reglas para PowerShell que no está verificada.
+- **Importante, corregido:** `arquitectura.md` atribuía mal a `npm test` los niveles de prueba que ejecuta.
+- **Menor, documentado:** el índice `idx_customers_company` (del esquema original) no lo usa ninguna consulta desde B4, porque la búsqueda y el orden usan `fold(company_name)`.
+
+**Pendientes al cerrar el proyecto:**
+- Revisión visual en un navegador real, en móvil y escritorio (la IA no tenía navegador).
+- Reglas de `.claude/settings.json` para PowerShell.

@@ -1,66 +1,51 @@
-# SaaS-O-Matic: guía para el asistente de IA
+# Directrices para la IA y configuración del entorno
 
-Herramienta interna para registrar clientes corporativos, simular su consumo SaaS y presupuestar la suscripción mensual (tramos + impuestos + multi-divisa).
+Cómo se configuró el asistente (Claude Code) para que el código siguiera patrones limpios y modulares, y cómo evolucionaron esas reglas durante el proyecto.
 
-**Fuente de verdad:** `ai-workspace/01-specs/spec.md`. Antes de implementar cualquier feature, léela. Si algo no está en la spec o la contradice, **pregunta antes de decidir**.
+> **Las reglas vigentes están en [CLAUDE.md](../../CLAUDE.md).** Este documento empezó siendo una copia, pero la copia se desfasó en cuanto las reglas cambiaron. Ahora explica el sistema y su evolución, y remite a CLAUDE.md como única versión viva.
 
-## Stack
+## Piezas del entorno
 
-- Backend: Node.js 26 (`engines >=26`, `.nvmrc`), TypeScript (strict), Fastify, better-sqlite3, Zod, Vitest.
-- Frontend: React + Vite + TypeScript, Vitest + Testing Library.
-- Un solo gestor de paquetes: npm.
+| Pieza | Qué hace |
+|---|---|
+| [CLAUDE.md](../../CLAUDE.md) | Reglas que el asistente carga en cada sesión: stack, estructura, capas, dinero en céntimos, SQL parametrizado, ficheros de ~200 líneas como máximo, tests obligatorios, accesibilidad y forma de trabajar. |
+| [spec.md](../01-specs/spec.md) | Fuente de verdad funcional. CLAUDE.md obliga a leerla antes de cada tarea y a **preguntar** si algo no está o la contradice. |
+| [plan.md](../01-specs/plan.md) | Tareas con objetivo, ficheros, criterio de aceptación y verificación, más la definición de terminado común. |
+| [/revisar](../../.claude/skills/revisar/SKILL.md) | Skill que audita los cambios contra CLAUDE.md y la spec, ejecuta tests y build, y devuelve problemas por gravedad **sin modificar nada**. |
+| [/registrar-sesion](../../.claude/skills/registrar-sesion/SKILL.md) | Skill que añade la nota de cada tarea a `03-vibe-coding/notas.md`. Prohíbe inventar correcciones: si no las conoce, pregunta. |
+| [.claude/settings.json](../../.claude/settings.json) | Permisos del asistente: reglas para permitir test, build y git y para denegar la lectura de `.env`. **Limitación conocida:** las reglas están escritas para Bash (`Bash(npm test:*)`…), pero en este entorno Windows los comandos se ejecutaron con PowerShell, y no se ha verificado que se apliquen. Además, `Bash(npm install)` es anterior al `npm ci` que usa ahora la raíz. Pendiente de revisar. |
 
-## Estructura (no la alteres sin avisar)
+## Ciclo de cada tarea
 
-```
-backend/src/
-  config/        tasas de impuestos, variables de entorno
-  domain/        lógica de negocio PURA: pricing.ts, taxId.ts (sin I/O)
-  db/            conexión y migraciones
-  repositories/  acceso a datos (único sitio con SQL de datos; el esquema vive en db/migrations/)
-  routes/        customers.ts, simulations.ts, pricing.ts (solo HTTP)
-  app.ts         composición de la app
-backend/tests/
-frontend/src/    api/, components/, features/, hooks/, utils/
-ai-workspace/    specs, arquitectura y registro del proceso con IA
-```
+1. El asistente **resume qué va a hacer y qué ficheros tocará** antes de escribir código (CLAUDE.md, "Forma de trabajar").
+2. Implementa en cambios pequeños, con tests.
+3. Ejecuta `npm test` y `npm run build`.
+4. Pasa **`/revisar`**. Los problemas se clasifican como bloqueante, importante o menor, y el desarrollador decide cuáles se corrigen.
+5. **`/registrar-sesion`** anota lo pedido, lo hecho, las decisiones, las correcciones del desarrollador y los problemas detectados.
+6. Un commit por tarea y `push`.
 
-## Reglas de arquitectura
+Ante cualquier hueco de la spec, el asistente pregunta en lugar de decidir. Así se resolvieron las ~30 dudas iniciales del plan y otras que surgieron después, como el orden del listado de clientes o la versión de Node.
 
-1. **Capas:** `routes` valida entrada (Zod), llama a `domain`/`repositories` y responde. Nada de lógica de negocio ni SQL en las rutas.
-2. **`domain/` es puro:** funciones sin acceso a BD, red ni reloj. Deben poder testearse sin mocks.
-3. **Dinero en céntimos enteros (EUR).** Prohibido usar `float` para calcular importes. La conversión a otra divisa solo ocurre en el frontend, al mostrar.
-4. **SQL parametrizado** siempre. Nunca concatenar strings en consultas.
-5. **Un fichero, una responsabilidad.** Máximo ~200 líneas por fichero; si crece, divídelo.
-6. **Errores con formato único** (ver spec, sección 6). Códigos HTTP: 201, 404, 409, 422.
-7. **Configuración, no constantes mágicas:** tasas de impuestos y precios por tramo viven en `config/`.
+## Evolución de las reglas
 
-## Calidad de código
+Las reglas no se escribieron una sola vez: se ajustaron cuando la práctica mostró un hueco.
 
-- TypeScript `strict`. Prohibido `any` y `@ts-ignore` salvo justificación en comentario.
-- Nombres descriptivos en inglés para código; textos de interfaz en español.
-- Sin código muerto, sin `console.log` olvidados, sin comentarios que repitan el código.
-- Funciones cortas y con un solo propósito. Evita anidar más de 2 niveles.
-- No añadas dependencias sin proponerlo antes y justificarlo.
+| Cambio en CLAUDE.md | Por qué | Tarea |
+|---|---|---|
+| Node 20 → **Node 26** | Node 20 ya no tiene soporte; el desarrollador eligió la versión instalada. | B1 |
+| "único sitio con SQL" → **"único sitio con SQL de datos; el esquema vive en `db/migrations/`"** | La regla, leída al pie de la letra, prohibía las migraciones. Se corrigió también en `/revisar`. | B3 |
+| Nuevas carpetas **`services/`, `http/`** (backend) y **`config/`** (frontend) | Aprobadas al resolver las dudas del plan, para no meter orquestación ni formato de errores en las rutas. | Plan |
+| Códigos HTTP **200 y 500** añadidos a 201/404/409/422; **JSON mal formado → 422** | La lista original no cubría las lecturas ni los errores inesperados. | Plan, B6 |
+| Estructura con **`frontend/e2e/`** y `package.json` en la raíz | La prueba de punta a punta pasó a ser permanente. | R1 |
+| **`.npmrc` con `ignore-scripts=true`** y la advertencia de no quitarlo sin una instalación limpia | Una instalación limpia intentaba compilar `better-sqlite3`. | R1 |
 
-## Tests (obligatorios)
+## Qué funcionó para evitar código desorganizado
 
-- Todo cambio en `domain/` lleva tests en el mismo commit.
-- `pricing`: cubrir 0, 1, 10, 11, 15, 50, 51 y 100 usuarios (tabla de la spec, sección 3.1).
-- `taxId`: DNI, NIE y CIF válidos e inválidos, con minúsculas, espacios y guiones.
-- Endpoints: casos felices y de error (422, 404, 409).
-- Antes de dar una tarea por terminada: `npm test` y `npm run build` en verde.
+- **Reglas concretas y comprobables** ("máximo ~200 líneas", "SQL solo en `repositories/`", "dinero en céntimos"): `/revisar` las verifica una por una. Así se detectó `index.css` con 411 líneas en F8.
+- **Revisar antes de cada commit, no al final:** cada problema se corrigió en su tarea, con su test, en lugar de acumularse.
+- **Pedir pruebas de cada afirmación:** los fallos más importantes se encontraron ejecutando cosas, no leyendo el código:
+  - las tildes en SQLite;
+  - el contraste de los bordes;
+  - la instalación limpia.
 
-## Frontend
-
-- Estados obligatorios al consumir la API de divisas: cargando, error con reintento, y *fallback* a EUR.
-- Responsive y móvil primero. Etiquetas y foco accesibles en formularios.
-- La lógica de tramos **no se duplica** en el frontend: usa `GET /pricing/preview`.
-- Formato de importes con `Intl.NumberFormat`.
-
-## Forma de trabajar
-
-1. Para cada feature: resume qué vas a hacer y qué ficheros tocarás **antes** de escribir código.
-2. Cambios pequeños y revisables; no reescribas ficheros enteros si basta con editar.
-3. Al terminar, explica brevemente qué hiciste y qué decisiones tomaste, para anotarlo en `ai-workspace/03-vibe-coding/`.
-4. Si detectas un fallo o deuda técnica en código previo, avísalo en vez de ocultarlo.
+  El resumen está en [03-vibe-coding/README.md](../03-vibe-coding/README.md).

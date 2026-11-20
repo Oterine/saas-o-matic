@@ -1,6 +1,29 @@
 # SaaS-O-Matic: plan de implementación
 
-Estado: **aprobado el 20/11/2026.** Todas las dudas de la sección 1 están resueltas (ver 1.4) y la spec está actualizada con ellas.
+Estado: **completado el 20/11/2026.** Todas las dudas de la sección 1 se resolvieron antes de programar (ver 1.4) y la spec se actualizó con ellas.
+
+### Estado final
+
+| Tarea | Commit | | Tarea | Commit |
+|---|---|---|---|---|
+| B1 Proyecto backend | `4ec3c44` | | F1 Proyecto frontend | `7f936f7` |
+| B2 Entorno | `9154cdf` | | F2 Cliente de API | `8d0678e` |
+| B3 SQLite y migraciones | `54f109c` | | F3 Divisas | `5b47f14` |
+| B4 Repositorio de clientes | `cf021b4` | | F4 Layout y rutas | `400f57b` |
+| B5 Repositorio de simulaciones | `5621ea8` | | F5 Dashboard y buscador | `be1758e` |
+| B6 App, errores y validación | `7aad1d2` | | F6 Alta de cliente | `c25b047` |
+| B7 `POST /customers` | `47e9cc9` | | F7 Detalle e historial | `424b3c8` |
+| B8 `POST /simulations` | `073c357` | | F8 Simulador | `516d356` |
+| B9 Lecturas | `db93d43` | | F9 Accesibilidad | `7a4e4e2` |
+| B10 `GET /pricing/preview` | `fc8fb09` | | R1 Arranque conjunto y e2e | `f5b8282` |
+| B10b `GET /countries` | `178ad6a` | | D1 README | `710eb31` |
+| B11 Prueba de punta a punta | `e946f0d` | | D2 Arquitectura y registro | (este commit) |
+
+Cambios respecto a lo planificado:
+- B4 no incluye `existsByTaxId` (la restricción `UNIQUE` cubre el caso sin condiciones de carrera).
+- F2 adelantó `api/countries.ts` desde F6.
+- F9 usa cálculo de contraste y `axe-core` en lugar de Lighthouse (no había navegador).
+- R1 incluye la prueba de punta a punta permanente (`npm run test:e2e`).
 
 Fuentes: `CLAUDE.md`, `ai-workspace/00-enunciado/enunciado.md`, `ai-workspace/01-specs/spec.md`.
 Punto de partida: `domain/pricing.ts`, `domain/taxId.ts`, `config/pricing.ts`, `config/taxRates.ts` y sus tests ya existen. No hay `package.json` ni otra configuración.
