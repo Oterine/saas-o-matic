@@ -2,7 +2,10 @@ import Fastify, { type FastifyInstance, type FastifyServerOptions } from 'fastif
 import type { Db } from './db/connection.js';
 import { NotFoundError, toErrorResponse } from './http/errors.js';
 import { createCustomerRepository } from './repositories/customerRepository.js';
+import { createSimulationRepository } from './repositories/simulationRepository.js';
 import { registerCustomerRoutes } from './routes/customers.js';
+import { registerSimulationRoutes } from './routes/simulations.js';
+import { createSimulationService } from './services/simulationService.js';
 
 export interface AppOptions {
   db: Db;
@@ -26,7 +29,12 @@ export function buildApp({ db, logger = false }: AppOptions): FastifyInstance {
     return reply.status(statusCode).send(body);
   });
 
-  registerCustomerRoutes(app, { customers: createCustomerRepository(db) });
+  const customers = createCustomerRepository(db);
+  const simulations = createSimulationRepository(db);
+  const simulationService = createSimulationService({ customers, simulations });
+
+  registerCustomerRoutes(app, { customers });
+  registerSimulationRoutes(app, { simulationService });
 
   return app;
 }

@@ -1,23 +1,10 @@
 import { z } from 'zod';
 import { PLANS } from '../../config/plans.js';
-import { getTaxRatePercent } from '../../config/taxRates.js';
 import type { NewCustomer } from '../../domain/customer.js';
 import { validateTaxId, type TaxIdResult } from '../../domain/taxId.js';
 import { ValidationError } from '../../http/errors.js';
 import { toFieldErrors, VALIDATION_MESSAGE } from '../../http/validate.js';
-
-/** Texto obligatorio, sin espacios a los lados, con mensajes en español. */
-function requiredText(label: string) {
-  const required = `${label} es obligatorio`;
-  return z
-    .string({ error: (issue) => (issue.input === undefined ? required : `${label} debe ser texto`) })
-    .trim()
-    .min(1, { error: required });
-}
-
-const supportedCountry = requiredText('El país')
-  .toUpperCase()
-  .refine((code) => getTaxRatePercent(code) !== undefined, { error: 'País no soportado' });
+import { requiredText, supportedCountry } from './fields.js';
 
 const newCustomerSchema = z.object(
   {

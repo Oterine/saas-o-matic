@@ -1,4 +1,5 @@
 import { DuplicateTaxIdError } from '../repositories/errors.js';
+import { CustomerNotFoundError } from '../services/errors.js';
 
 export type ErrorCode = 'VALIDATION_ERROR' | 'NOT_FOUND' | 'DUPLICATE_TAX_ID' | 'INTERNAL_ERROR';
 export type FieldErrors = Record<string, string>;
@@ -58,6 +59,9 @@ function frameworkClientStatus(error: unknown): number | undefined {
 export function toErrorResponse(error: unknown): ErrorResponse {
   if (error instanceof HttpError) {
     return response(error.statusCode, error.code, error.message, error.fields);
+  }
+  if (error instanceof CustomerNotFoundError) {
+    return response(404, 'NOT_FOUND', error.message);
   }
   if (error instanceof DuplicateTaxIdError) {
     return response(409, 'DUPLICATE_TAX_ID', error.message, {

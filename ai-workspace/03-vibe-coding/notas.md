@@ -214,3 +214,28 @@
   - documentar la clave `fields._` en la spec;
   - mensaje "El plan es obligatorio" cuando falta el plan, coherente con el resto de campos;
   - tests de los límites exactos (nombre de 200 aceptado, email de más de 254 rechazado).
+
+## 20/11/2026 — B8: `POST /simulations`
+
+**Qué se pidió:** calcular el presupuesto de una simulación con la tasa del país del cliente y guardarlo.
+
+**Qué se hizo:**
+- `services/simulationService.ts`: busca el cliente, obtiene la tasa de su país, llama a `calculateQuote` del dominio y guarda. Si el cliente no existe, lanza `CustomerNotFoundError` (`services/errors.ts`), que `toErrorResponse` traduce a 404.
+- `routes/schemas/simulationSchemas.ts` (reglas de la spec §3.4 con mensajes en español), `routes/presenters.ts` (porcentaje → `taxRate` y `currency: "EUR"`) y `routes/simulations.ts`.
+- `routes/schemas/fields.ts`: campos compartidos (`requiredText` y `supportedCountry` vienen de `customerSchemas.ts`; se añaden los numéricos y `activeUsersField`, que reutilizará `/pricing/preview`).
+- `config/limits.ts` (límites de la §3.4) y `config/currency.ts`.
+- Resultado: **146/146 tests en verde**; typecheck y build sin errores.
+
+**Decisiones de diseño:**
+- **Un servicio para orquestar:** la ruta solo valida y responde, y el cálculo sigue estando solo en `domain/pricing.ts`.
+- **Los 2 decimales del almacenamiento se comprueban sobre el texto del número,** no multiplicando por 100, porque en coma flotante `0.29 * 100 = 28.999999999999996`. Hay un test con `0.29`.
+- **La tasa se guarda como porcentaje entero** y se convierte a fracción solo en la respuesta (presenter), nunca para calcular.
+- **Un país sin tasa configurada da 500,** no 422: el alta ya lo impide, así que indicaría una configuración incoherente.
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar dos mejoras de la revisión.
+
+**Problemas detectados:**
+- **Al releer antes de probar, la IA quitó dos cosas:** un tipo exportado que nadie usaba (`SimulationInput`) y un presenter que copiaba campo a campo lo que podía propagar.
+- **Revisión (`/revisar`, aprobada), dos mejoras aplicadas:**
+  - el servicio lanzaba `NotFoundError`, una clase de `http/`, así que la orquestación dependía de la capa HTTP. Ahora lanza `CustomerNotFoundError` propio, igual que el repositorio con `DuplicateTaxIdError`;
+  - `customerId` aceptaba 0 y su máximo producía el mensaje "no puede superar 9.007.199.254.740.991". Ahora es un entero positivo con el mensaje "El cliente debe ser un identificador válido" (4 tests nuevos).
