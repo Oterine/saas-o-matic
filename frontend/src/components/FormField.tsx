@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import './forms.css';
 
 /** Atributos de accesibilidad que enlazan un control con su ayuda y su error. */
 export function fieldA11y(id: string, error?: string, hint?: string) {

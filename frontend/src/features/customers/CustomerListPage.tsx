@@ -11,6 +11,7 @@ import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { errorMessage } from '../../utils/errors';
 import { CustomerCard } from './CustomerCard';
+import './customers.css';
 
 function resultsLabel(count: number): string {
   return count === 1 ? '1 cliente' : `${count} clientes`;

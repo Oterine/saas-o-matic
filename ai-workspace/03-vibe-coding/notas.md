@@ -509,3 +509,34 @@
   - `App.test` respondía `[]` para cualquier URL y ahora da 404 en el detalle;
   - el test de alta de F6 ahora comprueba que se llega al detalle del cliente creado.
 - **Revisión (`/revisar`, aprobada), corregido:** la flecha de "← Volver a clientes" se leía en voz alta; ahora está oculta al lector de pantalla.
+
+## 20/11/2026 — F8: simulador interactivo
+
+**Qué se pidió:** un simulador con deslizador de usuarios y campo numérico sincronizado, almacenamiento y llamadas, presupuesto en tiempo real en la divisa elegida y botón para guardar.
+
+**Qué se hizo:**
+- `config/simulator.ts` (deslizador 0–200, máximo 100 000, debounce de 250 ms y valores iniciales) y `hooks/usePricingPreview.ts` (debounce + `useAsync` con clave).
+- `features/simulator/`:
+  - `UsersInput` (deslizador y número sincronizados);
+  - `QuoteSummary` (base, impuesto y total con `formatCents`);
+  - `useSaveSimulation` (guardado con errores por campo);
+  - `Simulator` (formulario completo, integrado en el detalle).
+- Al guardar se llama a `history.retry` de F7, que refresca el historial sin recargar.
+- `index.css` (411 líneas) se dividió en seis hojas, cada una importada por su componente.
+- Resultado: **96/96 tests en verde**; build sin errores. El fichero más largo tiene 173 líneas.
+
+**Decisiones de diseño:**
+- **Los tramos solo se calculan en el backend:** el simulador muestra lo que devuelve `GET /pricing/preview`. Una búsqueda en el código lo confirma.
+- **El texto escrito se envía tal cual.** Si no es válido, el 422 del backend explica el motivo junto al campo, así que no hay validación duplicada.
+- **Con un error de la vista previa se ocultan los importes anteriores,** que no corresponderían a lo escrito.
+
+**Correcciones del desarrollador:** ninguna. Aprobó aplicar la mejora de la revisión.
+
+**Problemas detectados:**
+- **La IA escribió dos veces conversiones que engañaban al compilador** (`as unknown as number` y `undefined as number`) y las corrigió antes de la revisión, cambiando los tipos para que digan la verdad:
+  - `getPricingPreview` acepta texto;
+  - `createSimulation` acepta `SimulationInput`, con campos posiblemente ausentes.
+- **Al contar líneas antes de la revisión apareció `index.css` con 411 líneas,** el doble del máximo de CLAUDE.md. Había crecido tarea a tarea sin que nadie lo vigilara. Se dividió por responsabilidad, y la base se importa la primera para respetar la cascada.
+- **Los tests de F6 y F7 que llegan al detalle necesitaron simular también `api/pricing`.**
+- **Revisión (`/revisar`, aprobada), corregido:** el layout de escritorio dependía del orden de los hijos (`:nth-child`); ahora asigna las áreas por clase.
+- **Pendiente para F9:** probar el simulador de punta a punta con el backend real (los tests usan respuestas simuladas).

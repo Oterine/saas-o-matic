@@ -23,6 +23,14 @@ export interface NewSimulation {
   apiCalls: number;
 }
 
+/**
+ * Lo que se envía al guardar desde el formulario: un campo vacío viaja ausente y el backend
+ * responde "… es obligatorio" (la validación no se duplica en el frontend).
+ */
+export type SimulationInput = { customerId: number } & {
+  [K in Exclude<keyof NewSimulation, 'customerId'>]: NewSimulation[K] | undefined;
+};
+
 export interface PricingPreview {
   activeUsers: number;
   baseCents: number;

@@ -10,6 +10,7 @@ import { renderApp } from '../../testUtils';
 vi.mock('../../api/countries', () => ({ listCountries: vi.fn() }));
 vi.mock('../../api/customers', () => ({ createCustomer: vi.fn(), getCustomer: vi.fn(), listCustomers: vi.fn() }));
 vi.mock('../../api/simulations', () => ({ listSimulations: vi.fn(async () => []), createSimulation: vi.fn() }));
+vi.mock('../../api/pricing', () => ({ getPricingPreview: vi.fn(() => new Promise(() => {})) }));
 const listCountriesMock = vi.mocked(listCountries);
 const createCustomerMock = vi.mocked(createCustomer);
 const getCustomerMock = vi.mocked(getCustomer);

@@ -1,6 +1,7 @@
 import { Link, Outlet } from 'react-router-dom';
 import { CurrencySelector } from './CurrencySelector';
 import { ExchangeRateStatus } from './ExchangeRateStatus';
+import './layout.css';
 
 const MAIN_CONTENT_ID = 'contenido';
 

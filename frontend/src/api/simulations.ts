@@ -1,7 +1,8 @@
 import { request } from './http';
-import type { NewSimulation, Simulation } from './types';
+import type { Simulation, SimulationInput } from './types';
 
-export function createSimulation(simulation: NewSimulation): Promise<Simulation> {
+/** Guarda una simulación. Acepta campos ausentes: el backend valida y responde 422 por campo. */
+export function createSimulation(simulation: SimulationInput): Promise<Simulation> {
   return request<Simulation>('/simulations', { method: 'POST', body: simulation });
 }
 

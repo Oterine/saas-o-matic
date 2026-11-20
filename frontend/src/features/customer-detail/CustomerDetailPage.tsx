@@ -8,8 +8,10 @@ import { Loading } from '../../components/Loading';
 import { useAsync } from '../../hooks/useAsync';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { errorMessage } from '../../utils/errors';
+import { Simulator } from '../simulator/Simulator';
 import { CustomerInfoCard } from './CustomerInfoCard';
 import { SimulationHistory } from './SimulationHistory';
+import './detail.css';
 
 /** Solo enteros positivos: así una URL como /customers/abc no llega a la API. */
 function parseCustomerId(raw: string | undefined): number | undefined {
@@ -52,13 +54,20 @@ function CustomerDetail({ id }: { id: number }) {
 
       {customer.data && (
         <div className="detail-layout">
-          <CustomerInfoCard customer={customer.data} />
-          <SimulationHistory
-            status={history.status}
-            simulations={history.data}
-            error={history.error}
-            onRetry={history.retry}
-          />
+          <div className="detail-layout__info">
+            <CustomerInfoCard customer={customer.data} />
+          </div>
+          <div className="detail-layout__simulator">
+            <Simulator customer={customer.data} onSaved={history.retry} />
+          </div>
+          <div className="detail-layout__history">
+            <SimulationHistory
+              status={history.status}
+              simulations={history.data}
+              error={history.error}
+              onRetry={history.retry}
+            />
+          </div>
         </div>
       )}
     </>

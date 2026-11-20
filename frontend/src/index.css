@@ -1,4 +1,7 @@
-/* Estilos base, móvil primero. Los componentes añaden los suyos sobre estas variables. */
+/*
+ * Estilos base, móvil primero: variables de diseño, elementos comunes y estados.
+ * Cada componente o vista importa además su propia hoja (layout, formularios, simulador...).
+ */
 :root {
   color-scheme: light;
   --color-bg: #f6f7f9;
@@ -65,24 +68,29 @@ h3 {
   margin: 0;
 }
 
+a {
+  color: var(--color-primary);
+}
+
 /* Foco visible solo con teclado, con buen contraste en ambos temas. */
 :focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
 }
 
-.app-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-3);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+/* Oculto a la vista pero leído por los lectores de pantalla. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-/* Controles comunes */
+/* Controles */
 .button {
   font: inherit;
   padding: var(--space-2) var(--space-3);
@@ -91,6 +99,11 @@ h3 {
   background: var(--color-primary);
   color: var(--color-primary-contrast);
   cursor: pointer;
+}
+
+a.button {
+  display: inline-block;
+  text-decoration: none;
 }
 
 .button--secondary {
@@ -113,73 +126,6 @@ input {
   color: var(--color-text);
 }
 
-.currency-selector {
-  display: flex;
-  gap: var(--space-2);
-  align-items: center;
-}
-
-/* Avisos */
-.notice {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-3);
-  align-items: center;
-  margin: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius);
-}
-
-.notice--info {
-  color: var(--color-text-muted);
-}
-
-.notice--warning {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
-  border: 1px solid currentColor;
-}
-
-.app-brand {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.app-main {
-  max-width: 72rem;
-  margin: 0 auto;
-  padding: var(--space-3);
-}
-
-.app-main:focus {
-  outline: none;
-}
-
-.app-main h1 {
-  margin-bottom: var(--space-3);
-}
-
-a {
-  color: var(--color-primary);
-}
-
-/* Enlace de salto: invisible hasta que recibe el foco con el teclado. */
-.skip-link {
-  position: absolute;
-  left: var(--space-3);
-  top: -3rem;
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-surface);
-  border-radius: var(--radius);
-  z-index: 10;
-}
-
-.skip-link:focus {
-  top: var(--space-2);
-}
-
 .card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -188,59 +134,7 @@ a {
   padding: var(--space-3);
 }
 
-/* Oculto a la vista pero leído por los lectores de pantalla. */
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.page-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-3);
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-3);
-}
-
-.app-main .page-header h1 {
-  margin-bottom: 0;
-}
-
-a.button {
-  display: inline-block;
-  text-decoration: none;
-}
-
-.search-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  margin-bottom: var(--space-3);
-}
-
-/* Lista de clientes: una columna en móvil, varias en pantallas anchas. */
-.customer-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--space-3);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
-}
-
-.customer-card__name {
-  font-size: 1.125rem;
-  margin-bottom: var(--space-2);
-}
-
-/* Pares etiqueta-valor (tarjetas de cliente, detalle e historial). */
+/* Pares etiqueta-valor (tarjetas de cliente, detalle, historial y simulador). */
 .data-list {
   margin: 0;
   display: grid;
@@ -273,114 +167,6 @@ a.button {
   color: var(--color-text);
 }
 
-/* Detalle del cliente: una columna en móvil, datos e historial lado a lado en escritorio. */
-.back-link {
-  display: inline-block;
-  margin-bottom: var(--space-2);
-}
-
-.detail-layout {
-  display: grid;
-  gap: var(--space-3);
-  align-items: start;
-}
-
-.detail-card h2 {
-  font-size: 1.125rem;
-  margin-bottom: var(--space-3);
-}
-
-.history-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: var(--space-3);
-}
-
-.history-item {
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.history-item:last-child {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.history-item__date {
-  margin: 0 0 var(--space-2);
-  font-weight: 600;
-}
-
-@media (min-width: 64rem) {
-  .detail-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  }
-}
-
-/* Formularios */
-.form {
-  display: grid;
-  gap: var(--space-3);
-  max-width: 36rem;
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.form-field label,
-.form-field legend {
-  font-weight: 600;
-  padding: 0;
-}
-
-.form-field--invalid input,
-.form-field--invalid select,
-input[aria-invalid='true'],
-select[aria-invalid='true'] {
-  border-color: var(--color-danger);
-}
-
-.form-field__hint {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-}
-
-.form-field__error {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--color-danger);
-  font-weight: 600;
-}
-
-.radio-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-4);
-}
-
-.radio {
-  display: inline-flex;
-  gap: var(--space-2);
-  align-items: center;
-  font-weight: 400;
-}
-
-.form-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  align-items: center;
-}
-
 /* Estados de carga, error y vacío */
 .state {
   padding: var(--space-3);
@@ -411,14 +197,4 @@ select[aria-invalid='true'] {
   margin: 0 0 var(--space-2);
   font-weight: 600;
   color: var(--color-text);
-}
-
-@media (min-width: 48rem) {
-  .app-header {
-    padding: var(--space-3) var(--space-5);
-  }
-
-  .app-main {
-    padding: var(--space-4) var(--space-5);
-  }
 }

@@ -9,6 +9,7 @@ import { renderApp } from '../../testUtils';
 
 vi.mock('../../api/customers', () => ({ getCustomer: vi.fn(), listCustomers: vi.fn() }));
 vi.mock('../../api/simulations', () => ({ listSimulations: vi.fn(), createSimulation: vi.fn() }));
+vi.mock('../../api/pricing', () => ({ getPricingPreview: vi.fn(() => new Promise(() => {})) }));
 const getCustomerMock = vi.mocked(getCustomer);
 const listSimulationsMock = vi.mocked(listSimulations);
 
