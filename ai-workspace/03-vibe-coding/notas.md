@@ -663,3 +663,23 @@
 **Pendientes al cerrar el proyecto:**
 - Revisión visual en un navegador real, en móvil y escritorio (la IA no tenía navegador).
 - Reglas de `.claude/settings.json` para PowerShell.
+
+## 20/11/2026 — Cierre del proyecto
+
+**Qué se pidió:** registrar el cierre, con una verificación final sobre el estado definitivo del repositorio.
+
+**Qué se hizo:**
+- Verificación completa desde la raíz sobre el commit `db00b6b`, con el árbol de trabajo limpio:
+  - `npm test`: **backend 194/194 y frontend 104/104 en verde**;
+  - `npm run test:e2e`: **1/1 en verde**;
+  - `npm run build`: sin errores.
+- Sin cambios de código. El plan está completo: 24 tareas, cada una con su commit, su revisión y su nota.
+
+**Decisiones de diseño:** ninguna nueva. El resumen del proceso está en [README.md](README.md) y las decisiones, en [02-arquitectura/decisiones.md](../02-arquitectura/decisiones.md).
+
+**Correcciones del desarrollador:** ninguna en este paso.
+
+**Problemas detectados (pendientes que quedan para el desarrollador):**
+- Revisar la app en un navegador real, en móvil y escritorio: la IA no tuvo navegador en ninguna sesión, así que el aspecto visual no lo ha visto nadie.
+- Adaptar a PowerShell las reglas de `.claude/settings.json`, escritas para Bash.
+- Opcional: añadir a esta carpeta capturas de prompts o de la conversación.
