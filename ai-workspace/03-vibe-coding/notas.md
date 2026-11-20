@@ -540,3 +540,37 @@
 - **Los tests de F6 y F7 que llegan al detalle necesitaron simular también `api/pricing`.**
 - **Revisión (`/revisar`, aprobada), corregido:** el layout de escritorio dependía del orden de los hijos (`:nth-child`); ahora asigna las áreas por clase.
 - **Pendiente para F9:** probar el simulador de punta a punta con el backend real (los tests usan respuestas simuladas).
+
+## 20/11/2026 — F9: pulido de accesibilidad y responsive
+
+**Qué se pidió:** repasar los criterios de la spec §7 de calidad de interfaz (responsive, accesibilidad, foco) y cerrar los pendientes de F4 y F8.
+
+**Qué se hizo:**
+- `Layout.tsx`: al cambiar de ruta, el foco pasa a `<main>` (pendiente de F4). No salta al cargar la página, aunque React esté en modo estricto.
+- `index.css`:
+  - variable `--color-input-border` para los bordes de los controles;
+  - `overflow-wrap` en los encabezados, para que los nombres largos no desborden a 360 px.
+- `src/a11y.test.tsx`: `axe-core` revisa las cuatro pantallas con reglas WCAG 2.0/2.1/2.2 A y AA, también con estados de error y validación, más un control negativo.
+- Prueba **temporal** de punta a punta contra el backend real (pendiente de F8). Pasó y se borró; en R1 se convierte en un comando permanente.
+- Resultado: **frontend 104/104 tests en verde y backend 194/194**; builds sin errores.
+
+**Decisiones de diseño:**
+- **Lighthouse requiere navegador y aquí no lo hay.** Se sustituyó por comprobaciones objetivas:
+  - contraste calculado con la fórmula WCAG para 13 pares en los dos temas;
+  - `axe-core` sobre el DOM real de cada pantalla.
+- **`color-contrast` desactivada en `axe`:** jsdom no calcula estilos; el contraste se calculó aparte.
+- **`axe-core` directamente en lugar de `vitest-axe`:** el desarrollador aprobó `vitest-axe`, pero al revisarlo resultó ser la versión 0.1.0 de 2022, sin mantenimiento. Solo añade un *matcher* sobre `axe-core`, así que se usa el motor directamente: las mismas comprobaciones con una dependencia menos.
+
+**Correcciones del desarrollador:**
+- Aprobó añadir la comprobación automática de accesibilidad.
+- Pidió convertir la prueba de punta a punta en un comando permanente (`npm run test:e2e`, en R1).
+
+**Problemas detectados:**
+- **Fallo real de contraste:** el borde de los campos tenía 1,36:1 en el tema claro y 1,43:1 en el oscuro, cuando WCAG 1.4.11 exige 3:1 para controles. Se corrigió con una variable propia: ahora es 3,84:1 en el tema claro y 3,87:1 en el oscuro. El resto de pares ya cumplían, de 5,7:1 a 16,6:1.
+- **La prueba de punta a punta no pudo cargar el backend dentro del entorno jsdom de Vitest** (`import.meta.url` deja de ser `file:`). Se arrancó el servidor compilado como proceso aparte y se le habló por HTTP real, una prueba aún más fiel. El recorrido completo pasó: alta con DNI incorrecto y CIF normalizado, vista previa con los tramos reales (121,00 € → 514,25 €), 422 por campo, guardado, historial refrescado y búsqueda sin tildes.
+- **Dos fallos de la IA en el propio test de `axe`:**
+  - un test prometía comprobar el formulario "con errores visibles" y no los provocaba;
+  - el control negativo comprobaba el mensaje del error en lugar del contenido.
+
+  Los dos se corrigieron antes del commit.
+- **Pendiente:** el desarrollador debe revisar visualmente la app en móvil y escritorio (la IA no tiene navegador).

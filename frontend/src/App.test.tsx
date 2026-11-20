@@ -41,6 +41,21 @@ describe('App: layout y rutas', () => {
     expect(document.title).toBe(`${title} · SaaS-O-Matic`);
   });
 
+  it('no mueve el foco al cargar la primera página', () => {
+    renderApp('/');
+    expect(screen.getByRole('main')).not.toHaveFocus();
+  });
+
+  it('al navegar a otra página el foco pasa al contenido principal', async () => {
+    const user = userEvent.setup();
+    renderApp('/');
+
+    await user.click(screen.getByRole('link', { name: 'Nuevo cliente' }));
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Nuevo cliente' })).toBeInTheDocument();
+    expect(screen.getByRole('main')).toHaveFocus();
+  });
+
   it('una ruta desconocida muestra la página 404 con enlace al listado', async () => {
     const user = userEvent.setup();
     renderApp('/no-existe');
