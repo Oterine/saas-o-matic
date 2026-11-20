@@ -143,3 +143,24 @@
 - **Importante, corregido:** `LIKE` y `COLLATE NOCASE` de SQLite solo ignoran mayúsculas en ASCII. Se comprobó ejecutándolo: `ÑANDÚ` no aparecía al buscar `ñandú` y `Álvarez` se ordenaba después de `zeta`. Se resolvió con la función `fold` en el `WHERE` y el `ORDER BY`, más tests con tildes y ñ. Efecto aceptado: la ñ ordena junto a la n.
 - Menor, corregido: se justificó con un comentario la conversión del resultado de `RETURNING`.
 - Limitación conocida: si se abre la BD con una herramienta externa, `fold` no existe. Solo afecta a las consultas de búsqueda, no al esquema.
+
+## 20/11/2026 — B5: repositorio de simulaciones
+
+**Qué se pidió:** concentrar el SQL de `simulations`: guardar una simulación y listar el historial de un cliente.
+
+**Qué se hizo:**
+- `domain/simulation.ts` (solo tipos), con `SimulationRow` y `mapSimulationRow` en `repositories/mappers.ts`.
+- `repositories/simulationRepository.ts`: `create` (con `RETURNING`) y `listByCustomer` (`created_at DESC, id DESC`).
+- `tests/repositories/simulationRepository.test.ts` (6 casos).
+- Resultado: **86/86 tests en verde**; typecheck y build sin errores.
+
+**Decisiones de diseño:**
+- **El repositorio no calcula nada:** guarda los importes que recibe. El cálculo vive en `domain/pricing.ts` y la orquestación irá en el servicio (B8).
+- **La tasa se guarda como `taxRatePercent` entero.** La conversión a la fracción `taxRate` y el campo `currency` pertenecen a la respuesta HTTP (B8), no a los datos.
+- **Los tests de orden fijan `created_at` a mano** para no depender del reloj. Uno de ellos tiene el `id` y la fecha en sentidos opuestos, para demostrar que manda la fecha.
+
+**Correcciones del desarrollador:** ninguna.
+
+**Problemas detectados (revisión con `/revisar`, aprobada):**
+- Si el servicio no comprobara antes que el cliente existe, la FK haría que la API respondiera 500 en vez de 404. Queda como requisito para B8, con su test.
+- `mapSimulationRow` solo se prueba de forma indirecta, a través de `create`. Se acepta.
