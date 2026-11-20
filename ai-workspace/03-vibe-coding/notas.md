@@ -119,3 +119,27 @@
 - CLAUDE.md decía que `repositories/` era el "único sitio con SQL", lo que contradice tener el esquema en `db/migrations/`. Se precisó como "SQL de datos" en CLAUDE.md, en `directrices-ia.md` y en la skill `revisar`, que además nombraba `domain/` como sitio permitido para el SQL.
 - Se borraron los `.gitkeep` de las carpetas que ya tienen contenido.
 - Pendiente sin urgencia: el runner no avisa de forma específica si dos migraciones tienen la misma versión (falla igualmente y revierte).
+
+## 20/11/2026 — B4: repositorio de clientes
+
+**Qué se pidió:** concentrar todo el SQL de `customers` (crear, buscar por id y buscar por texto) con consultas parametrizadas.
+
+**Qué se hizo:**
+- `config/plans.ts` (planes y tipo `Plan`), `config/search.ts` (límite de 100) y `domain/customer.ts` (solo tipos).
+- `repositories/mappers.ts` (filas a camelCase y `createdAt` a ISO UTC), `repositories/errors.ts` (`DuplicateTaxIdError`) y `repositories/customerRepository.ts` (`create` con `RETURNING`, `findById` y `search`).
+- `db/functions.ts`: función SQL `fold` (minúsculas y sin tildes), registrada en `openDatabase`.
+- Spec §6: orden del listado y búsqueda que no distingue tildes.
+- Resultado: **80/80 tests en verde**; typecheck y build sin errores.
+
+**Decisiones de diseño:**
+- **Repositorio como factoría `createCustomerRepository(db)`:** las sentencias se preparan una vez y la BD se inyecta (en los tests, en memoria).
+- **Se quitó `existsByTaxId`, previsto en el plan:** comprobar antes de insertar abre una ventana para condiciones de carrera. La restricción `UNIQUE`, traducida a `DuplicateTaxIdError`, lo cubre de forma atómica.
+- **En la búsqueda se escapan `%`, `_` y `\`.** Si el texto queda vacío al normalizarse, no se busca en `tax_id`, para no devolver todos los clientes.
+
+**Correcciones del desarrollador:**
+- La spec no fijaba el orden del listado. Ante la pregunta de la IA, el desarrollador eligió **orden alfabético por empresa**.
+
+**Problemas detectados (revisión con `/revisar`):**
+- **Importante, corregido:** `LIKE` y `COLLATE NOCASE` de SQLite solo ignoran mayúsculas en ASCII. Se comprobó ejecutándolo: `ÑANDÚ` no aparecía al buscar `ñandú` y `Álvarez` se ordenaba después de `zeta`. Se resolvió con la función `fold` en el `WHERE` y el `ORDER BY`, más tests con tildes y ñ. Efecto aceptado: la ñ ordena junto a la n.
+- Menor, corregido: se justificó con un comentario la conversión del resultado de `RETURNING`.
+- Limitación conocida: si se abre la BD con una herramienta externa, `fold` no existe. Solo afecta a las consultas de búsqueda, no al esquema.

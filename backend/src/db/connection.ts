@@ -2,6 +2,7 @@ import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Database from 'better-sqlite3';
+import { registerSqlFunctions } from './functions.js';
 
 export type Db = Database.Database;
 
@@ -24,5 +25,6 @@ export function openDatabase(dbPath: string): Db {
   const db = new Database(path);
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
+  registerSqlFunctions(db);
   return db;
 }
