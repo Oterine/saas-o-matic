@@ -773,3 +773,26 @@
 **Correcciones del desarrollador:** ninguna.
 
 **Problemas detectados:** ninguno. Queda pendiente que el desarrollador compruebe las reglas `PowerShell(...)` en `/permissions`.
+
+## 23/11/2026 — Cierre de la sesión: revisión en el navegador terminada
+
+**Qué se pidió:** cerrar la sesión con una verificación final, tras terminar la revisión visual de la app en el navegador.
+
+**Qué se hizo:**
+- **Revisión en el navegador** (20 y 23/11), hecha por el desarrollador. Dio lugar a tres commits:
+  - paso de 1 en 1 en el almacenamiento;
+  - pulido visual: tarjetas, botones, desplegables, deslizador, botones −/+ y foco;
+  - foco de las tarjetas protegido con `@supports`.
+- **Verificación final** desde la raíz, sobre el commit `f6ccffd` con el árbol limpio:
+  - `npm test`: **backend 194/194 y frontend 118/118 en verde**;
+  - `npm run test:e2e`: **1/1 en verde**;
+  - `npm run build`: sin errores.
+- Sin cambios de código en este paso.
+
+**Decisiones de diseño:** ninguna nueva. Las de la revisión están en sus notas: no añadir el borrado de clientes y mantener siempre el foco visible.
+
+**Correcciones del desarrollador:** ninguna en este paso.
+
+**Problemas detectados:**
+- La revisión en el navegador encontró problemas que ningún test había detectado: el deslizador deformado, el paso de 0,01 en el almacenamiento y la estética de enlaces, flechas y foco. **Los tests y `axe` comprueban el comportamiento y la accesibilidad, pero no sustituyen mirar la app.**
+- **Pendiente para el desarrollador:** comprobar en `/permissions` que aparecen las reglas `PowerShell(...)`.
