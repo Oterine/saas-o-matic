@@ -682,7 +682,6 @@
 **Problemas detectados (pendientes que quedan para el desarrollador):**
 - Revisar la app en un navegador real, en móvil y escritorio: la IA no tuvo navegador en ninguna sesión, así que el aspecto visual no lo ha visto nadie.
 - Adaptar a PowerShell las reglas de `.claude/settings.json`, escritas para Bash.
-- Opcional: añadir a esta carpeta capturas de prompts o de la conversación.
 
 ## 20/11/2026 — Permisos del asistente para PowerShell
 
