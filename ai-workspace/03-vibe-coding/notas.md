@@ -721,3 +721,41 @@
 - Decidió dejar «Llamadas a la API» de 1 en 1, porque lo habitual es escribir la cifra.
 
 **Problemas detectados:** ninguno nuevo. La revisión visual sigue en curso.
+
+## 23/11/2026 — Revisión en el navegador: pulido visual
+
+**Qué se pidió:** el desarrollador terminó la revisión visual. Pidió mejorar el aspecto de los enlaces de las tarjetas, convertir «Volver a clientes» en botón, resaltar los botones al pasar el ratón y cambiar la flecha de los desplegables, el deslizador de usuarios, las flechas de los campos numéricos y los recuadros de foco.
+
+**Qué se hizo:**
+- **Tarjetas del listado:**
+  - nombre en el color del texto, sin subrayado;
+  - toda la tarjeta clicable con un "enlace estirado" (un único enlace para teclado y lector de pantalla);
+  - realce del borde al pasar el ratón;
+  - el plan como etiqueta.
+- **Botones** (`components/buttons.css`): estados al pasar el ratón y al pulsar. «Volver a clientes» con aspecto de botón secundario (sigue siendo un enlace, porque navega).
+- **Desplegables:** chevron propio en lugar de la flecha nativa de Windows.
+- **Deslizador:** barra rellena hasta el valor actual, tirador redondo y marcas 0 y 200. Heredaba los estilos generales de `input`, que lo deformaban.
+- **`components/NumberStepper.tsx`:** campo numérico con botones −/+ propios en usuarios, almacenamiento y llamadas.
+- **Foco** (`components/controls.css`): en campos, borde azul con halo en lugar del recuadro separado; en el campo con −/+, el halo rodea el bloque; en el deslizador, el tirador. Botones y enlaces conservan el contorno solo con teclado.
+- Resultado: **backend 194/194, frontend 118/118 (12 nuevos) y e2e 1/1 en verde**; build sin errores.
+
+**Decisiones de diseño:**
+- **El foco nunca se elimina, solo cambia de aspecto** (WCAG 2.4.7). En el modo de alto contraste de Windows, que quita sombras e imágenes, vuelven el contorno sólido, la flecha nativa y el deslizador nativo.
+- **El subrayado se mantiene en los enlaces que van dentro de un texto** (WCAG 1.4.1), con un trazo más fino y separado.
+- **Contraste calculado antes de aplicar cada color nuevo:**
+  - etiqueta del plan 6,84:1 / 7,90:1;
+  - botones al pasar el ratón ≥ 4,84:1;
+  - chevron 6,27:1 / 7,06:1;
+  - barra del deslizador 3,84:1.
+- **Los botones −/+ quedan fuera del recorrido con Tab:** con teclado se usan ↑/↓ en el campo. Tienen nombre accesible y están enlazados al campo con `aria-controls`.
+- **La lista desplegada del `<select>` sigue siendo nativa:** sustituirla exigiría un componente propio, con más riesgo de accesibilidad a dos días de la entrega.
+- **Hojas nuevas** (`buttons.css`, `controls.css`, `number-stepper.css`), para que `index.css` siga por debajo de ~200 líneas (168).
+
+**Correcciones del desarrollador:**
+- **Propuso añadir el borrado de clientes.** La IA recordó que la spec lo excluye de forma explícita (§1) y que el enunciado no lo pide, y recomendó no ampliar el alcance al final del proyecto. **El desarrollador decidió no añadirlo.**
+- **Todos los ajustes visuales salieron de su revisión en el navegador,** que la IA no podía hacer.
+- **Eligió botones −/+ propios** en lugar de solo ocultar las flechas nativas, la opción que la IA recomendaba por ser más barata.
+
+**Problemas detectados:**
+- **El deslizador se veía roto porque heredaba los estilos generales de `input`.** Los tests y `axe` no lo detectaron: es un problema puramente visual. Lo encontró la revisión del desarrollador en el navegador.
+- **Revisión (`/revisar`, aprobada), pendiente menor:** el foco de la tarjeta depende de `:has()`; en navegadores sin soporte (anteriores a 2023) quedaría sin indicador. Se corrige envolviendo esas reglas en `@supports selector(:has(*))`.

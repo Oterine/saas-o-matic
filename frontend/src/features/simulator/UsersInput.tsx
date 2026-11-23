@@ -1,5 +1,6 @@
 import { useId } from 'react';
 import { fieldA11y } from '../../components/FormField';
+import { NumberStepper } from '../../components/NumberStepper';
 import { MAX_USERS, SLIDER_MAX_USERS } from '../../config/simulator';
 import { formatNumber } from '../../utils/format';
 
@@ -22,34 +23,46 @@ export function UsersInput({ value, onChange, error }: UsersInputProps) {
   const id = useId();
   const numberId = `${id}-number`;
   const hint = `El deslizador llega a ${SLIDER_MAX_USERS}; para más usuarios escribe la cifra (hasta ${formatNumber(MAX_USERS)}).`;
+  const position = sliderPosition(value);
+  // La parte recorrida de la barra se pinta en el color principal; el resto, en gris.
+  const fill = `${(position / SLIDER_MAX_USERS) * 100}%`;
 
   return (
     <fieldset className="form-field users-input">
       <legend>Usuarios activos</legend>
       <div className="users-input__controls">
-        <input
-          type="range"
-          min={0}
-          max={SLIDER_MAX_USERS}
-          step={1}
-          value={sliderPosition(value)}
-          onChange={(event) => onChange(event.target.value)}
-          aria-label="Usuarios activos (deslizador)"
-          aria-describedby={`${numberId}-hint`}
-        />
+        <div className="users-input__slider">
+          <input
+            type="range"
+            min={0}
+            max={SLIDER_MAX_USERS}
+            step={1}
+            value={position}
+            onChange={(event) => onChange(event.target.value)}
+            aria-label="Usuarios activos (deslizador)"
+            aria-describedby={`${numberId}-hint`}
+            style={{
+              background: `linear-gradient(to right, var(--color-primary) ${fill}, var(--color-input-border) ${fill})`,
+            }}
+          />
+          <div className="users-input__scale" aria-hidden="true">
+            <span>0</span>
+            <span>{SLIDER_MAX_USERS}</span>
+          </div>
+        </div>
         <label htmlFor={numberId} className="visually-hidden">
           Usuarios activos (número)
         </label>
-        <input
+        <NumberStepper
           {...fieldA11y(numberId, error, hint)}
           name="activeUsers"
-          type="number"
           inputMode="numeric"
-          min={0}
-          max={MAX_USERS}
           step={1}
+          max={MAX_USERS}
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onValueChange={onChange}
+          decreaseLabel="Reducir usuarios activos"
+          increaseLabel="Aumentar usuarios activos"
         />
       </div>
       <p id={`${numberId}-hint`} className="form-field__hint">

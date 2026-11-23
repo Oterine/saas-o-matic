@@ -1,7 +1,6 @@
 /* Detalle del cliente: una columna en móvil; en escritorio, datos y simulador a la izquierda e historial a la derecha. */
 .back-link {
-  display: inline-block;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .detail-layout {

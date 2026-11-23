@@ -1,0 +1,76 @@
+/* Campo numérico con botones −/+ propios: campo y botones forman un único bloque. */
+.number-stepper {
+  display: flex;
+  align-items: stretch;
+  max-width: 14rem;
+  border-radius: var(--radius);
+  transition: box-shadow 0.15s ease;
+}
+
+/* Foco: el halo rodea el bloque entero (botones incluidos), no solo la caja central. */
+.number-stepper:has(input:focus-visible) {
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.number-stepper input:focus-visible {
+  box-shadow: none;
+}
+
+.number-stepper:has(input:focus-visible) .number-stepper__button {
+  border-color: var(--color-primary);
+}
+
+.number-stepper input {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  border-radius: 0;
+  /* Sin las flechas nativas: los botones −/+ las sustituyen. */
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.number-stepper input::-webkit-inner-spin-button,
+.number-stepper input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-stepper__button {
+  flex: 0 0 2.5rem;
+  min-height: 2.5rem;
+  font: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  border: 1px solid var(--color-input-border);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.number-stepper__button:first-child {
+  border-right: 0;
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.number-stepper__button:last-child {
+  border-left: 0;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.number-stepper__button:hover:not(:disabled) {
+  background: var(--color-tint);
+}
+
+.number-stepper__button:disabled {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .number-stepper__button {
+    transition: none;
+  }
+}

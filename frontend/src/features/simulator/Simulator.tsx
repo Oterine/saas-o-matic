@@ -4,6 +4,7 @@ import type { Customer } from '../../api/types';
 import { Card } from '../../components/Card';
 import { ErrorMessage } from '../../components/ErrorMessage';
 import { FormField, fieldA11y } from '../../components/FormField';
+import { NumberStepper } from '../../components/NumberStepper';
 import { DEFAULT_SIMULATION } from '../../config/simulator';
 import { usePricingPreview } from '../../hooks/usePricingPreview';
 import { errorMessage } from '../../utils/errors';
@@ -51,28 +52,28 @@ export function Simulator({ customer, onSaved }: SimulatorProps) {
 
         <div className="form-row">
           <FormField id="storageGb" label="Almacenamiento (GB)" error={fieldErrors.storageGb}>
-            <input
+            <NumberStepper
               {...fieldA11y('storageGb', fieldErrors.storageGb)}
               name="storageGb"
-              type="number"
               inputMode="decimal"
-              min={0}
-              // "any": las flechas suben de 1 en 1 y se pueden escribir decimales (el máximo de 2 lo valida el backend).
+              // "any": se pueden escribir decimales sin que el campo se marque inválido (el máximo de 2 lo valida el backend).
               step="any"
               value={draft.storageGb}
-              onChange={(event) => update('storageGb', event.target.value)}
+              onValueChange={(value) => update('storageGb', value)}
+              decreaseLabel="Reducir almacenamiento"
+              increaseLabel="Aumentar almacenamiento"
             />
           </FormField>
           <FormField id="apiCalls" label="Llamadas a la API (mes)" error={fieldErrors.apiCalls}>
-            <input
+            <NumberStepper
               {...fieldA11y('apiCalls', fieldErrors.apiCalls)}
               name="apiCalls"
-              type="number"
               inputMode="numeric"
-              min={0}
               step={1}
               value={draft.apiCalls}
-              onChange={(event) => update('apiCalls', event.target.value)}
+              onValueChange={(value) => update('apiCalls', value)}
+              decreaseLabel="Reducir llamadas a la API"
+              increaseLabel="Aumentar llamadas a la API"
             />
           </FormField>
         </div>

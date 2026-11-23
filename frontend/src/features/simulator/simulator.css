@@ -2,18 +2,97 @@
 .users-input__controls {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2) var(--space-3);
+  gap: var(--space-2) var(--space-4);
   align-items: center;
 }
 
-.users-input__controls input[type='range'] {
+.users-input__slider {
   flex: 1 1 12rem;
   min-width: 0;
-  accent-color: var(--color-primary);
 }
 
-.users-input__controls input[type='number'] {
-  width: 8rem;
+/*
+ * Deslizador propio. Anula los estilos generales de input (borde, relleno, fondo), que lo deformaban.
+ * El relleno hasta el valor actual llega por estilo en línea (linear-gradient) desde UsersInput.
+ */
+.users-input input[type='range'] {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 0.5rem;
+  margin: 0.625rem 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.users-input input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-primary), 0 1px 3px rgb(0 0 0 / 0.3);
+  transition: transform 0.15s ease;
+}
+
+.users-input input[type='range']::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-primary), 0 1px 3px rgb(0 0 0 / 0.3);
+  transition: transform 0.15s ease;
+}
+
+.users-input input[type='range']::-moz-range-track {
+  background: transparent;
+}
+
+/* Foco: halo en el tirador, no un recuadro alrededor de toda la barra. */
+.users-input input[type='range']:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.users-input input[type='range']:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 6px var(--color-focus-ring);
+}
+
+.users-input input[type='range']:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 0 6px var(--color-focus-ring);
+}
+
+.users-input input[type='range']:hover::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+.users-input input[type='range']:hover::-moz-range-thumb {
+  transform: scale(1.15);
+}
+
+.users-input__scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .users-input input[type='range']::-webkit-slider-thumb,
+  .users-input input[type='range']::-moz-range-thumb {
+    transition: none;
+  }
+}
+
+/* Alto contraste de Windows: se recupera el deslizador nativo, que el sistema sí sabe pintar. */
+@media (forced-colors: active) {
+  .users-input input[type='range'] {
+    appearance: auto;
+  }
 }
 
 .form-row {

@@ -16,7 +16,72 @@
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
 }
 
+/* Tarjeta clicable: el enlace del nombre se "estira" con ::after hasta cubrir la tarjeta. */
+.customer-card {
+  position: relative;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.customer-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.12);
+  transform: translateY(-2px);
+}
+
+/* Foco con teclado: contorno alrededor de toda la tarjeta, no solo del nombre. */
+.customer-card:has(.customer-card__link:focus-visible) {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.customer-card__link:focus-visible {
+  outline: none;
+}
+
+.customer-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+}
+
+.customer-card__header {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
 .customer-card__name {
   font-size: 1.125rem;
-  margin-bottom: var(--space-2);
+}
+
+.customer-card__link {
+  color: var(--color-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.plan-badge {
+  flex-shrink: 0;
+  padding: 0.125rem var(--space-2);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--color-tint);
+  color: var(--color-badge-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .customer-card {
+    transition: none;
+  }
+
+  .customer-card:hover {
+    transform: none;
+  }
 }

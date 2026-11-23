@@ -42,7 +42,7 @@ function CustomerDetail({ id }: { id: number }) {
 
   return (
     <>
-      <Link to="/" className="back-link">
+      <Link to="/" className="button button--secondary back-link">
         <span aria-hidden="true">← </span>Volver a clientes
       </Link>
       <h1>{customer.data?.companyName ?? 'Detalle del cliente'}</h1>

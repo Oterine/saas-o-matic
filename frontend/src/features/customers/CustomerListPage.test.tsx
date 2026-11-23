@@ -41,6 +41,17 @@ describe('CustomerListPage', () => {
     expect(screen.getByText('2 clientes')).toBeInTheDocument();
   });
 
+  it('cada tarjeta tiene un único enlace (el nombre) y el plan como etiqueta', async () => {
+    listCustomersMock.mockResolvedValue([acme]);
+    renderApp('/');
+
+    const card = (await screen.findAllByRole('listitem'))[0]!;
+    const links = within(card).getAllByRole('link');
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAccessibleName('Acme S.L.');
+    expect(within(card).getByText('Business').closest('.plan-badge')).toHaveTextContent('Plan Business');
+  });
+
   it('sin clientes muestra un estado vacío con enlace para crear el primero', async () => {
     listCustomersMock.mockResolvedValue([]);
     renderApp('/');

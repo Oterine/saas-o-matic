@@ -1,5 +1,7 @@
 // La base va primero para que las hojas de cada componente puedan sobrescribirla.
 import './index.css';
+import './components/controls.css';
+import './components/buttons.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
