@@ -759,3 +759,17 @@
 **Problemas detectados:**
 - **El deslizador se veía roto porque heredaba los estilos generales de `input`.** Los tests y `axe` no lo detectaron: es un problema puramente visual. Lo encontró la revisión del desarrollador en el navegador.
 - **Revisión (`/revisar`, aprobada), pendiente menor:** el foco de la tarjeta depende de `:has()`; en navegadores sin soporte (anteriores a 2023) quedaría sin indicador. Se corrige envolviendo esas reglas en `@supports selector(:has(*))`.
+
+## 23/11/2026 — Foco de las tarjetas sin depender de `:has()`
+
+**Qué se pidió:** aplicar el pendiente menor de la revisión anterior.
+
+**Qué se hizo:**
+- `customers.css`: las dos reglas del foco de la tarjeta (el contorno de la tarjeta y quitar el del enlace) van ahora dentro de `@supports selector(:has(*))`.
+- Resultado: **frontend 118/118 tests en verde**; build sin errores.
+
+**Decisiones de diseño:** sin soporte de `:has()`, el enlace conserva su propio contorno, así que el foco nunca queda invisible. Los navegadores actuales no notan ningún cambio.
+
+**Correcciones del desarrollador:** ninguna.
+
+**Problemas detectados:** ninguno. Queda pendiente que el desarrollador compruebe las reglas `PowerShell(...)` en `/permissions`.

@@ -31,14 +31,19 @@
   transform: translateY(-2px);
 }
 
-/* Foco con teclado: contorno alrededor de toda la tarjeta, no solo del nombre. */
-.customer-card:has(.customer-card__link:focus-visible) {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
-}
+/*
+ * Foco con teclado: contorno alrededor de toda la tarjeta, no solo del nombre. Solo si el navegador
+ * soporta :has(); si no, el enlace conserva su propio contorno y el foco nunca queda invisible.
+ */
+@supports selector(:has(*)) {
+  .customer-card:has(.customer-card__link:focus-visible) {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
 
-.customer-card__link:focus-visible {
-  outline: none;
+  .customer-card__link:focus-visible {
+    outline: none;
+  }
 }
 
 .customer-card__link::after {
