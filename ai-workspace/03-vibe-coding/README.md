@@ -1,6 +1,6 @@
 # Proceso de desarrollo con IA
 
-Resumen de cómo se construyó SaaS-O-Matic con Claude Code. El detalle de cada tarea (qué se pidió, qué se hizo, decisiones, correcciones del desarrollador y problemas) está en **[notas.md](notas.md)**. Cómo se configuró el asistente se explica en [02-arquitectura/directrices-ia.md](../02-arquitectura/directrices-ia.md).
+Resumen de cómo se construyó SaaS-O-Matic con Claude Code. El detalle de cada tarea (qué se pidió, qué se hizo, decisiones, correcciones del desarrollador y problemas) está en **[notas.md](notas.md)**. Los prompts clave del desarrollador, transcritos literalmente, están en **[prompts.md](prompts.md)**. Cómo se configuró el asistente se explica en [02-arquitectura/directrices-ia.md](../02-arquitectura/directrices-ia.md).
 
 ## Cifras
 
@@ -8,7 +8,7 @@ Resumen de cómo se construyó SaaS-O-Matic con Claude Code. El detalle de cada 
 |---|---|
 | Tareas del plan | 24: B1–B11 y B10b (backend), F1–F9 (frontend), R1 (arranque), D1–D2 (documentación) |
 | Commits | Uno por tarea, más el inicial (spec, plan y dominio) |
-| Tests | 194 backend + 104 frontend + 1 de punta a punta |
+| Tests | 194 backend + 118 frontend + 1 de punta a punta |
 | Dudas de la spec resueltas antes de programar | ~30 (contradicciones C1–C8 y huecos A1–A15 del [plan](../01-specs/plan.md)) |
 
 ## Cómo se trabajó

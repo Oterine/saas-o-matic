@@ -144,6 +144,7 @@ La carpeta [ai-workspace/](ai-workspace/) recoge cómo se diseñó y construyó 
 - [01-specs/](ai-workspace/01-specs/): la [spec](ai-workspace/01-specs/spec.md) (fuente de verdad) y el [plan](ai-workspace/01-specs/plan.md) de tareas, con las dudas detectadas y cómo se resolvieron.
 - [02-arquitectura/](ai-workspace/02-arquitectura/): las directrices de arquitectura para la IA.
 - [03-vibe-coding/notas.md](ai-workspace/03-vibe-coding/notas.md): el registro de cada tarea, con las decisiones tomadas, las correcciones del desarrollador y los errores de la IA detectados en la revisión.
+- [03-vibe-coding/prompts.md](ai-workspace/03-vibe-coding/prompts.md): los prompts clave con los que se guió a la IA, transcritos literalmente.
 - [CLAUDE.md](CLAUDE.md) y [.claude/](.claude/): las reglas que sigue el asistente y las skills de revisión (`/revisar`) y registro (`/registrar-sesion`).
 
 ## Notas técnicas
